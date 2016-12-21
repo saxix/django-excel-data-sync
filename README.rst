@@ -2,12 +2,11 @@
 Django ExcelDataSync
 =====================
 
-.. image:: https://badge.fury.io/py/xls-uploader.png
-:target: https://badge.fury.io/py/xls-uploader
+.. image:: https://badge.fury.io/py/excel_data_sync.png
+:target: https://badge.fury.io/py/excel_data_sync
 
-.. image:: https://travis-ci.org/saxix/xls-uploader.png?branch=master
-:target: https://travis-ci.org/saxix/xls-uploader
-
+.. image:: https://travis-ci.org/saxix/excel_data_sync.png?branch=master
+:target: https://travis-ci.org/saxix/excel_data_sync
 
 
 It allows to create XLS file to import data into Django Model.
@@ -25,6 +24,7 @@ DateTimeField
 DecimalField
 EmailField
 FloatField
+ForeignKey
 GenericIPAddressField
 IntegerField
 NullBooleanField*
@@ -48,14 +48,14 @@ min length
 Documentation
 -------------
 
-The full documentation is at https://xls-uploader.readthedocs.io.
+The full documentation is at https://excel_data_sync.readthedocs.io.
 
 Quickstart
 ----------
 
 Install ExcelDataSync::
 
-    pip install xls-uploader
+    pip install django-excel-data-sync
 
 Add it to your `INSTALLED_APPS`:
 
@@ -63,7 +63,7 @@ Add it to your `INSTALLED_APPS`:
 
     INSTALLED_APPS = (
         ...
-        'excel_data_sync.apps.XlsUploaderConfig',
+        'excel_data_sync.apps.XlsDataSyncConfig',
         ...
     )
 
