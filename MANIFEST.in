@@ -1,0 +1,8 @@
+include AUTHORS.rst
+include CONTRIBUTING.rst
+include HISTORY.rst
+include LICENSE
+include README.rst
+
+recursive-include src/excel_data_sync *.html *.png *.gif *js *.css *jpg *jpeg *svg *py vbaProject.bin
+recursive-include src/requirements *.pip

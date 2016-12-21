@@ -1,0 +1,30 @@
+[run]
+branch = True
+source = excel_data_sync
+include =
+plugins =
+    django_coverage_plugin
+
+omit =
+
+[paths]
+source =
+        src/
+
+[html]
+directory = ~build/coverage
+
+[report]
+fail_under = 95
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+    pragma: nocover
+    pragma: no-cover
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+    if settings.DEBUG
+    raise NotImplementedError
+    sentry.captureException
