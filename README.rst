@@ -17,26 +17,26 @@ prevent errors due the lack of constraints
 Supported Fields
 ----------------
 
-    - :py:class:`~django.db.models.BigIntegerField`
-    - :py:class:`~django.db.models.BooleanField`
-    - :py:class:`~django.db.models.AutoField`
-    - :py:class:`~django.db.models.CharField`
-    - :py:class:`~django.db.models.DateField`
-    - :py:class:`~django.db.models.DateTimeField`
-    - :py:class:`~django.db.models.DecimalField`
-    - :py:class:`~django.db.models.EmailField`
-    - :py:class:`~django.db.models.FloatField`
-    - :py:class:`~django.db.models.ForeignKey`
-    - :py:class:`~django.db.models.GenericIPAddressField`
-    - :py:class:`~django.db.models.IntegerField`
-    - :py:class:`~django.db.models.NullBooleanField`
-    - :py:class:`~django.db.models.PositiveIntegerField`
-    - :py:class:`~django.db.models.SmallIntegerField`
-    - :py:class:`~django.db.models.TextField`
-    - :py:class:`~django.db.models.TimeField`
-    - :py:class:`~django.db.models.URLField`
-    - :py:class:`~django.db.models.UUIDField`
-`
+    - BigIntegerField
+    - BooleanField
+    - AutoField
+    - CharField
+    - DateField
+    - DateTimeField
+    - DecimalField
+    - EmailField
+    - FloatField
+    - ForeignKey
+    - GenericIPAddressField
+    - IntegerField
+    - NullBooleanField*
+    - PositiveIntegerField
+    - PositiveSmallIntegerField
+    - SmallIntegerField
+    - TextField
+    - TimeField
+    - URLField
+    - UUIDField
 
 Supported Validations
 ---------------------
@@ -44,18 +44,18 @@ Supported Validations
 Fields attributes
 ~~~~~~~~~~~~~~~~~
 
-    - choices :py:attr:`django.db.models.Field.choices`
-    - unique :py:attr:`django.db.models.Field.unique`
+    - choices
+    - unique
 
 
 Field Validators
 ~~~~~~~~~~~~~~~~
 
 
-    - max value (:class:`django.core.validators.MaxValueValidator`)
-    - min value (:class:`django.core.validators.MinValueValidator`)
-    - max length (:class:`django.core.validators.MaxLengthValidator`)
-    - min length (:class:`django.core.validators.MinLengthValidator`)
+    - max value (`MaxValueValidator`)
+    - min value (`MinValueValidator`)
+    - max length `MaxLengthValidator`)
+    - min length (`MinLengthValidator`)
 
 
 Documentation
