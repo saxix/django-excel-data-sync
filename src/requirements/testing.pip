@@ -1,5 +1,4 @@
 coverage==4.2
-django-watch
 django-webtest
 django_coverage_plugin
 flake8>=2.1.0
@@ -9,6 +8,5 @@ pytest-cov
 pytest-django
 pytest-echo
 pytest-pythonpath
-pytest-testmon
 pytz
 tox>=1.7.0

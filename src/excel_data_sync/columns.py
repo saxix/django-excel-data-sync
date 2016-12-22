@@ -303,10 +303,7 @@ class ForeignKeyColumn(Column):
                               )
 
     def _get_validation(self):
-        related = self.field.rel.to
-        return {"validate": "list",
-                "dropdown": True,
-                "value": [str(x) for x in related.objects.all()]}
+        pass
 
 
 mapping = {models.Field: Column,

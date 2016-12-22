@@ -10,45 +10,58 @@ Django ExcelDataSync
 
 
 It allows to create XLS file to import data into Django Model.
-The xls implement most of the validation rules of the django model fields, this
+The xls implements most of the validation rules of the django model fields, this
 prevent errors due the lack of constraints
 
 
 Supported Fields
 ----------------
-BigIntegerField
-BooleanField
-CharField
-DateField
-DateTimeField
-DecimalField
-EmailField
-FloatField
-ForeignKey
-GenericIPAddressField
-IntegerField
-NullBooleanField*
-PositiveIntegerField
-PositiveSmallIntegerField
-SmallIntegerField
-TextField
-TimeField
-URLField
-UUIDField
+
+    - :py:class:`~django.db.models.BigIntegerField`
+    - :py:class:`~django.db.models.BooleanField`
+    - :py:class:`~django.db.models.AutoField`
+    - :py:class:`~django.db.models.CharField`
+    - :py:class:`~django.db.models.DateField`
+    - :py:class:`~django.db.models.DateTimeField`
+    - :py:class:`~django.db.models.DecimalField`
+    - :py:class:`~django.db.models.EmailField`
+    - :py:class:`~django.db.models.FloatField`
+    - :py:class:`~django.db.models.ForeignKey`
+    - :py:class:`~django.db.models.GenericIPAddressField`
+    - :py:class:`~django.db.models.IntegerField`
+    - :py:class:`~django.db.models.NullBooleanField`
+    - :py:class:`~django.db.models.PositiveIntegerField`
+    - :py:class:`~django.db.models.SmallIntegerField`
+    - :py:class:`~django.db.models.TextField`
+    - :py:class:`~django.db.models.TimeField`
+    - :py:class:`~django.db.models.URLField`
+    - :py:class:`~django.db.models.UUIDField`
+`
 
 Supported Validations
 ---------------------
-unique
-max value
-min value
-max length
-min length
+
+Fields attributes
+~~~~~~~~~~~~~~~~~
+
+    - choices :py:attr:`django.db.models.Field.choices`
+    - unique :py:attr:`django.db.models.Field.unique`
+
+
+Field Validators
+~~~~~~~~~~~~~~~~
+
+
+    - max value (:class:`django.core.validators.MaxValueValidator`)
+    - min value (:class:`django.core.validators.MinValueValidator`)
+    - max length (:class:`django.core.validators.MaxLengthValidator`)
+    - min length (:class:`django.core.validators.MinLengthValidator`)
 
 
 Documentation
 -------------
 
-The full documentation is at https://excel_data_sync.readthedocs.io.
+The full documentation is at http://django-excel-data-sync.readthedocs.io/en/latest/
 
 Quickstart
 ----------
@@ -67,23 +80,6 @@ Add it to your `INSTALLED_APPS`:
         ...
     )
 
-Add ExcelDataSync's URL patterns:
-
-.. code-block:: python
-
-    from excel_data_sync import urls as excel_data_sync_urls
-
-
-    urlpatterns = [
-        ...
-        url(r'^', include(excel_data_sync_urls)),
-        ...
-    ]
-
-Features
---------
-
-* TODO
 
 Running Tests
 -------------
@@ -96,13 +92,3 @@ Does the code actually work?
     (myenv) $ pip install tox
     (myenv) $ tox
 
-Credits
--------
-
-Tools used in rendering this package:
-
-*  Cookiecutter_
-*  `cookiecutter-djangopackage`_
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`cookiecutter-djangopackage`: https://github.com/pydanny/cookiecutter-djangopackage

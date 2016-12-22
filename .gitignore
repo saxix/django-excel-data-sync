@@ -30,3 +30,5 @@ sdist
 var
 ~build
 /manage.py
+.testmondata
+.DS_Store
