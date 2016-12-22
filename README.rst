@@ -2,8 +2,8 @@
 Django ExcelDataSync
 ====================
 
-.. image:: https://badge.fury.io/py/excel_data_sync.png
-    :target: https://badge.fury.io/py/excel_data_sync
+.. image:: https://badge.fury.io/py/django_excel_data_sync.png
+    :target: https://badge.fury.io/py/django_excel_data_sync
 
 .. image:: https://travis-ci.org/saxix/django-excel-data-sync.png?branch=develop
     :target: https://travis-ci.org/saxix/django-excel-data-sync
