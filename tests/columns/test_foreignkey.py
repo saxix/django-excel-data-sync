@@ -4,10 +4,9 @@
 import logging
 
 import pytest
-
-from example.models import DemoModel, Option
+from example.models import DemoModel
 from excel_data_sync.inspector import process_model
-from helperfunctions import get_target_xls, get_io, _compare_xlsx_files
+from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
 
 logger = logging.getLogger(__name__)
 

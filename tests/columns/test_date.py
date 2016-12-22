@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # from __future__ import absolute_import, unicode_literals
 
+import datetime
 import logging
 
 import pytest
-import datetime
-from django.db.models import (DateField, DateTimeField, TimeField)
+from django.db.models import DateField, DateTimeField, TimeField
 from excel_data_sync.columns import get_column
 
 logger = logging.getLogger(__name__)

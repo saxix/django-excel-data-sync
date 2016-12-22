@@ -3,7 +3,6 @@ import sys
 
 import django_webtest
 import pytest
-
 from example.management.demo import create_sample_data
 
 

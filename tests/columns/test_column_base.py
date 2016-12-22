@@ -4,9 +4,8 @@ from __future__ import absolute_import, unicode_literals
 import logging
 from six import BytesIO as StringIO
 
-from django.db.models import IntegerField, Field
-
-from excel_data_sync.columns import get_column, IntegerColumn
+from django.db.models import Field, IntegerField
+from excel_data_sync.columns import IntegerColumn, get_column
 from excel_data_sync.xls import XlsTemplate
 
 logger = logging.getLogger(__name__)

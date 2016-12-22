@@ -4,7 +4,7 @@
 import logging
 
 from django.db.models import UUIDField
-from excel_data_sync.columns import get_column, UUIDColumn
+from excel_data_sync.columns import UUIDColumn, get_column
 
 logger = logging.getLogger(__name__)
 

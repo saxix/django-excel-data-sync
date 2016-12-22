@@ -2,9 +2,8 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.contrib.admin import ModelAdmin, site
-
-from example.models import UserDetail, DemoModel, Option
-from excel_data_sync.admin import export_records, XlsDataSyncAdminMixin
+from example.models import DemoModel, Option, UserDetail
+from excel_data_sync.admin import XlsDataSyncAdminMixin, export_records
 
 
 class UserDetailModelAdmin(ModelAdmin):

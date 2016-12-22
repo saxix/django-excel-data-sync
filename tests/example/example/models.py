@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+from six import python_2_unicode_compatible
+
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from six import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

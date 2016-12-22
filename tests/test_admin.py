@@ -5,7 +5,6 @@ import logging
 import six
 
 import pytest
-
 from helperfunctions import _compare_xlsx_files, get_target_xls
 
 try:

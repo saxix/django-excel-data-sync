@@ -5,10 +5,9 @@ import logging
 
 import pytest
 from django.db import models
-
 from example.models import DemoModel
 from excel_data_sync.inspector import process_model
-from helperfunctions import _compare_xlsx_files, get_target_xls, get_io
+from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
 
 logger = logging.getLogger(__name__)
 

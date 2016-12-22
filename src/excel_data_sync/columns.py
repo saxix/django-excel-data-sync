@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import datetime
 import logging
 
-import datetime
 from django.core import validators
 from django.db import models
 from django.db.backends.base.operations import BaseDatabaseOperations
-
-from excel_data_sync.validators import RuleEngine, THIS_COL
+from django.db.models import Field
+from excel_data_sync.validators import THIS_COL, RuleEngine
 
 logger = logging.getLogger(__name__)
 
@@ -309,13 +309,15 @@ class ForeignKeyColumn(Column):
                 "value": [str(x) for x in related.objects.all()]}
 
 
-mapping = {models.SmallIntegerField: SmallIntegerColumn,
+mapping = {models.Field: Column,
+           models.SmallIntegerField: SmallIntegerColumn,
            models.IntegerField: IntegerColumn,
            models.BigIntegerField: BigIntegerColumn,
            models.PositiveSmallIntegerField: PositiveSmallIntegerColumn,
            models.PositiveIntegerField: PositiveIntegerColumn,
            models.GenericIPAddressField: IpAddressColumn,
 
+           models.AutoField: Column,
            models.ForeignKey: ForeignKeyColumn,
 
            models.BooleanField: BooleanColumn,
@@ -336,5 +338,35 @@ mapping = {models.SmallIntegerField: SmallIntegerColumn,
            }
 
 
+def register_column(key, col):
+    if isinstance(key, Field):
+        target = "{}.{}.{}".format(key.model._meta.app_label,
+                                   key.model._meta.model_name,
+                                   key.name).lower()
+    else:
+        target = key
+    mapping[target] = col
+
+
+def unregister_column(key):
+    if isinstance(key, Field):
+        target = "{}.{}.{}".format(key.model._meta.app_label,
+                                   key.model._meta.model_name,
+                                   key.name).lower()
+    else:
+        target = key
+    del mapping[target]
+
+
 def get_column(field, options=None):
-    return mapping.get(type(field), Column)(field, options)
+    try:
+        target = "{}.{}.{}".format(field.model._meta.app_label,
+                                   field.model._meta.model_name,
+                                   field.name).lower()
+        klass = mapping.get(target, mapping.get(type(field), Column))
+    except AttributeError:
+        klass = mapping.get(type(field), Column)
+    try:
+        return klass(field, options)
+    except TypeError:
+        raise ValueError("unknown field {}".format(field))

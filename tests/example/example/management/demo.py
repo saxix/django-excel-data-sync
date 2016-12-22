@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import logging
-# import random
-
 import itertools
-
-from decimal import Decimal
+import logging
 from datetime import datetime
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from example.models import DemoModel, Option
+
+# import random
+
+
 # from faker import Faker
 
 # fake = Faker()

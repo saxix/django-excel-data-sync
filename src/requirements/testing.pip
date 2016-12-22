@@ -1,14 +1,14 @@
 coverage==4.2
-mock>=1.0.1
-flake8>=2.1.0
-tox>=1.7.0
-django_coverage_plugin
-pytest
-pytest-django
-pytest-pythonpath
-pytest-cov
-pytest-echo
+django-watch
 django-webtest
+django_coverage_plugin
+flake8>=2.1.0
+mock>=1.0.1
+pytest
+pytest-cov
+pytest-django
+pytest-echo
+pytest-pythonpath
+pytest-testmon
 pytz
-Faker
- # Additional test requirements go here
+tox>=1.7.0

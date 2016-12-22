@@ -5,14 +5,14 @@
 # Copyright (c), 2013-2016, John McNamara, jmcnamara@cpan.org
 #
 
-import re
-import sys
 import os.path
-from zipfile import ZipFile
-from zipfile import BadZipfile
-from zipfile import LargeZipFile
-
+import re
 import six
+import sys
+from contextlib import contextmanager
+from zipfile import BadZipfile, LargeZipFile, ZipFile
+
+from excel_data_sync.columns import mapping, register_column, unregister_column
 
 here = os.path.dirname(__file__)
 
@@ -109,6 +109,18 @@ def get_target_xls(name):
 def get_io(n):
     return six.BytesIO()
     # return n
+
+
+@contextmanager
+def register(key, col):
+    old = None
+    if key in mapping:
+        old = mapping[key]
+    register_column(key, col)
+    yield
+    unregister_column(key)
+    if old:
+        register_column(key, old)
 
 
 def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements=[]):  # noqa

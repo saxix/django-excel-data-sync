@@ -4,8 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import logging
 
 import pytz
-
-from excel_data_sync.columns import get_column, Header
+from excel_data_sync.columns import Header, get_column
 from excel_data_sync.xls import XlsTemplate
 
 logger = logging.getLogger(__name__)

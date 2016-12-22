@@ -5,8 +5,8 @@ import logging
 import os
 
 from xlsxwriter import Workbook
-from xlsxwriter.worksheet import Worksheet
 from xlsxwriter.chartsheet import Chartsheet
+from xlsxwriter.worksheet import Worksheet
 
 logger = logging.getLogger(__name__)
 

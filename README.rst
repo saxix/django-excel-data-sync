@@ -1,12 +1,12 @@
-=====================
+====================
 Django ExcelDataSync
-=====================
+====================
 
 .. image:: https://badge.fury.io/py/excel_data_sync.png
     :target: https://badge.fury.io/py/excel_data_sync
 
-.. image:: https://travis-ci.org/saxix/excel_data_sync.png?branch=master
-    :target: https://travis-ci.org/saxix/excel_data_sync
+.. image:: https://travis-ci.org/saxix/django-excel-data-sync.png?branch=master
+    :target: https://travis-ci.org/saxixdjango-excel-data-sync
 
 
 It allows to create XLS file to import data into Django Model.

@@ -3,7 +3,7 @@
 
 import logging
 
-from django.db.models import (NullBooleanField, BooleanField)
+from django.db.models import BooleanField, NullBooleanField
 from excel_data_sync.columns import get_column
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand
 from django.apps import apps
-
+from django.core.management.base import BaseCommand
 from excel_data_sync.inspector import process_model
 
 
@@ -27,6 +26,11 @@ class Command(BaseCommand):
         filename = options['filename']
         m = apps.get_model(model)
         f = filename or '{}.xls'.format(model)
-
-        process_model(m, f, data=options['data'])
+        if options['data']:
+            qs = m.objects.all()
+        else:
+            qs = None
+        process_model(m, f, queryset=qs)
         self.stdout.write("Saved..{}".format(f))
+        if qs:
+            self.stdout.write("Dumped {} records".format(qs.count()))

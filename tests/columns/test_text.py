@@ -4,8 +4,8 @@
 import logging
 
 import pytest
-from django.db.models import (Field, CharField, URLField, EmailField)
-from excel_data_sync.columns import get_column, TextColumn, EmailColumn
+from django.db.models import CharField, EmailField, Field, URLField
+from excel_data_sync.columns import EmailColumn, TextColumn, get_column
 
 logger = logging.getLogger(__name__)
 
