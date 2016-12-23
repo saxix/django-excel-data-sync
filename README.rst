@@ -2,8 +2,8 @@
 Django ExcelDataSync
 ====================
 
-.. image:: https://badge.fury.io/py/django_excel_data_sync.png
-    :target: https://badge.fury.io/py/django_excel_data_sync
+.. image:: https://badge.fury.io/py/django-excel-data-sync.svg
+    :target: https://badge.fury.io/py/django-excel-data-sync
 
 .. image:: https://travis-ci.org/saxix/django-excel-data-sync.png?branch=develop
     :target: https://travis-ci.org/saxix/django-excel-data-sync
@@ -92,3 +92,35 @@ Does the code actually work?
     (myenv) $ pip install tox
     (myenv) $ tox
 
+
+Project links
+-------------
+
++--------------------+----------------+--------------+----------------------------+
+| Stable             | |master-build| | |master-cov| |                            |
++--------------------+----------------+--------------+----------------------------+
+| Development        | |dev-build|    | |dev-cov|    |                            |
++--------------------+----------------+--------------+----------------------------+
+| Project home page: |https://github.com/saxix/django-excel-data-sync             |
++--------------------+---------------+--------------------------------------------+
+| Issue tracker:     |https://github.com/saxix/django-excel-data-sync/issues?sort |
++--------------------+---------------+--------------------------------------------+
+| Download:          |http://pypi.python.org/pypi/django-excel-data-sync/         |
++--------------------+---------------+--------------------------------------------+
+| Documentation:     |https://django-excel-data-sync.readthedocs.org/en/latest/   |
++--------------------+---------------+--------------+-----------------------------+
+
+
+
+.. |master-build| image:: https://secure.travis-ci.org/saxix/django-excel-data-sync.png?branch=master
+                    :target: http://travis-ci.org/saxix/django-excel-data-sync/
+
+.. |master-cov| image:: https://codecov.io/github/saxix/django-excel-data-sync/coverage.svg?branch=master
+    :target: https://codecov.io/github/saxix/django-excel-data-sync?branch=master
+
+
+.. |dev-build| image:: https://secure.travis-ci.org/saxix/django-excel-data-sync.png?branch=develop
+                  :target: http://travis-ci.org/saxix/django-excel-data-sync/
+
+.. |dev-cov| image:: https://codecov.io/github/saxix/django-excel-data-sync/coverage.svg?branch=develop
+    :target: https://codecov.io/github/saxix/django-excel-data-sync?branch=develop
