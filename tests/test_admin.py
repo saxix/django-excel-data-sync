@@ -41,7 +41,7 @@ def test_export_template(app, admin_user, data):
     res.form['columns'] = ['email', 'range_5_10']
     res = res.form.submit('apply')
 
-    exp_filename = get_target_xls('test_admin_export.xls')
+    exp_filename = get_target_xls('admin_export.xls')
     io = six.BytesIO(res.content)
     # open(exp_filename, 'wb').write(io.read())
     got, exp = _compare_xlsx_files(io,
@@ -66,7 +66,7 @@ def test_export_records(app, admin_user, data):
     res.form['columns'] = ['id', 'range_5_10']
     res = res.form.submit('apply')
 
-    exp_filename = get_target_xls('test_admin_export_records.xls')
+    exp_filename = get_target_xls('admin_export_records.xls')
     io = six.BytesIO(res.content)
     # open(exp_filename, 'wb').write(io.read())
     assert res.status_code == 200

@@ -96,9 +96,6 @@ class Header(object):
 
 
 class Column(object):
-    max_value = None
-    min_value = None
-    max_length = None
     format = {'locked': 0}
     num_format = ''
     main_validator = None
@@ -113,6 +110,8 @@ class Column(object):
         self.rule_parser = RuleEngine(self.main_validator)
         self.default = field.default
         self.max_length = field.max_length
+        self.max_value = None
+        self.min_value = None
 
     def get_value_from_object(self, record):
         return getattr(record, self.field.name)
@@ -154,6 +153,7 @@ class Column(object):
                            max_value=self.max_value,
                            min_value=self.min_value,
                            max_length=self.max_length)
+
             if self.rule_parser:
                 formula = "=AND(%s)" % ",".join(self.rule_parser.get_rule(context))
             else:
@@ -217,6 +217,11 @@ class NumberColumn(Column):
         super(NumberColumn, self).__init__(field, options)
         self.min_value, self.max_value = BaseDatabaseOperations.integer_field_ranges[field.get_internal_type()]
 
+    def parse_validators(self):
+        super(NumberColumn, self).parse_validators()
+        self.rule_parser.append("min")
+        self.rule_parser.append("max")
+
 
 class SmallIntegerColumn(NumberColumn):
     pass
@@ -237,6 +242,18 @@ class PositiveSmallIntegerColumn(NumberColumn):
 class PositiveIntegerColumn(NumberColumn):
     def __init__(self, field, options=None):
         super(PositiveIntegerColumn, self).__init__(field, options)
+
+
+class AutoColumn(NumberColumn):
+    as_internal_type = "IntegerField"
+
+    def __init__(self, field, options=None):
+        super(NumberColumn, self).__init__(field, options)
+        self.min_value, self.max_value = BaseDatabaseOperations.integer_field_ranges[self.as_internal_type]
+
+
+class BigAutoColumn(AutoColumn):
+    as_internal_type = "BigIntegerField"
 
 
 class DecimalColumn(Column):
@@ -314,7 +331,7 @@ mapping = {models.Field: Column,
            models.PositiveIntegerField: PositiveIntegerColumn,
            models.GenericIPAddressField: IpAddressColumn,
 
-           models.AutoField: Column,
+           models.AutoField: AutoColumn,
            models.ForeignKey: ForeignKeyColumn,
 
            models.BooleanField: BooleanColumn,
@@ -333,6 +350,11 @@ mapping = {models.Field: Column,
            models.UUIDField: UUIDColumn,
            models.URLField: TextColumn,
            }
+
+try:
+    mapping[models.BigAutoField] = BigAutoColumn
+except AttributeError:
+    pass
 
 
 def register_column(key, col):

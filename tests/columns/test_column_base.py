@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import logging
 from six import BytesIO as StringIO
 
-from django.db.models import Field, IntegerField
+from django.db.models import Field, IntegerField, CharField, PositiveSmallIntegerField
 from excel_data_sync.columns import IntegerColumn, get_column
 from excel_data_sync.xls import XlsTemplate
 
@@ -54,12 +54,13 @@ def test_format():
 
 
 def test_unique():
-    f = IntegerField('Field1', unique=True)
+    f = PositiveSmallIntegerField('Field1', unique=True)
     c = get_column(f)
     v = c._get_validation()
     assert v['validate'] == 'custom'
     assert v['value'] == '=AND(ISNUMBER(VALUE(THIS)),' \
-                         'COUNTIF(INDIRECT(ADDRESS(1,COLUMN()) & ":" & ADDRESS(65536, COLUMN())),THIS)=1)'
+                         'COUNTIF(INDIRECT(ADDRESS(1,COLUMN()) & ":" & ADDRESS(65536, COLUMN())),THIS)=1,' \
+                         'VALUE(THIS)>=0,VALUE(THIS)<=32767)'
     assert v["error_message"].split("\n")[1] == "No duplicates allowed in this column"
 
 

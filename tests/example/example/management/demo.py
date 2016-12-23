@@ -50,7 +50,7 @@ def factory(r=1, **values):
     # random.seed(seed)
 
     defaults = {
-        'bigint': r,
+        'big_integer': r,
         'char': 'Name {}'.format(r),
         'choices': next(choices)[0],
         'date': datetime.fromtimestamp(r * 1000000).date(),
@@ -60,9 +60,9 @@ def factory(r=1, **values):
         'float': 0.1 * r,
         'generic_ip': "10.10.10.{}".format(r),
         'integer': r * 100,
-        'logic': [True, False][int(r % 2)],
+        'boolean': [True, False][int(r % 2)],
         'max_value_10': 8,
-        'null_logic': [True, False][int(r % 2)],
+        'null_boolean': [True, False][int(r % 2)],
         'option': Option.objects.filter(pk=1).first(),
         'positive_integer': '{}'.format(r),
         'positive_small_integer': '{}'.format(r),

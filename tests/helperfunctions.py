@@ -107,8 +107,9 @@ def get_target_xls(name):
 
 
 def get_io(n):
-    return six.BytesIO()
-    # return n
+    if os.path.exists(n):
+        return six.BytesIO()
+    return n
 
 
 @contextmanager
