@@ -116,6 +116,22 @@ class Column(object):
     def get_value_from_object(self, record):
         return getattr(record, self.field.name)
 
+    def to_xls(self, value):
+        """
+        Converts the input value into the expected Python data type, raising
+        django.core.exceptions.ValidationError if the data can't be converted.
+        Returns the converted value. Subclasses should override this.
+        """
+        return value
+
+    def to_python(self, value):
+        """
+        Converts the input value into the expected Python data type, raising
+        django.core.exceptions.ValidationError if the data can't be converted.
+        Returns the converted value. Subclasses should override this.
+        """
+        return value
+
     def get_format(self, book):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
