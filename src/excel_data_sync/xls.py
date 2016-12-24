@@ -52,6 +52,16 @@ class XlsTemplate(Workbook):
     #         self.add_vba_project(os.path.join(os.path.dirname(__file__), 'vbaProject.bin'))
     #         self._vba_added = True
 
+    def __del__(self):
+        """Close file in destructor if it hasn't been closed explicitly."""
+        try:
+            if not self.fileclosed and self.filename:
+                self.close()
+        except:
+            raise Exception("Exception caught in workbook destructor. "
+                            "Explicit close() may be required for workbook.")
+
+
     def add_worksheet(self, name=None, worksheet_class=None):
         """
         Add a new worksheet to the Excel workbook.
