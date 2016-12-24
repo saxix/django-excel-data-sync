@@ -33,7 +33,7 @@ class Command(RunServer):
                             help='creates sample data. Default 10 rows')
 
     def handle(self, *args, **options):
-        call_command('migrate')
+        call_command('migrate', verbosity=0)
         if options['admin']:
             create_admin()
         if options['zap']:

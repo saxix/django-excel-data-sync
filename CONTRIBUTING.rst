@@ -79,7 +79,7 @@ Ready to contribute? Here's how to set up `django-excel-datasync` for local deve
 
         $ flake8 src tests
         $ isort -rc -c src/ tests/
-        $ python setup.py test
+        $ pytest tests/
         $ tox
 
    To get flake8 and tox, just pip install them into your virtualenv.
@@ -110,4 +110,15 @@ Tips
 
 To run a subset of tests::
 
-    $ python -m unittest tests.test_xls_uploader
+    $ pytest tests/columns/test_date.py
+
+Run demo application
+--------------------
+
+to run the demo app::
+
+   $ cd tests/example
+   $ python manage.py rundemo --admin --data
+
+now ou can navigate to http://127.0.0.1:8000/ and login using `admin/123`
+
