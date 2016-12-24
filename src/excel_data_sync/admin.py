@@ -13,7 +13,8 @@ from django.shortcuts import render
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
-from excel_data_sync.inspector import process_model
+# from excel_data_sync.inspector import process_model
+from excel_data_sync.xls import XlsTemplate
 
 try:
     from admin_extra_urls.extras import ExtraUrlMixin, link
@@ -71,13 +72,11 @@ class XlsDataSyncAdminMixin(ExtraUrlMixin):
             form = XlsDataSyncOptionForm(request.POST, model=model)
             if form.is_valid():
                 filename = form.cleaned_data['filename']
-                vba = form.cleaned_data['require_vba']
                 fields = form.cleaned_data['columns']
                 out = six.BytesIO()
-                process_model(model, out,
-                              fields=fields,
-                              options={'vba': vba},
-                              )
+                with XlsTemplate(out) as xls:
+                    xls.process_model(model,
+                                      fields=fields)
                 out.seek(0)
                 response = HttpResponse(out.read(),
                                         content_type="application/vnd.ms-excel"
@@ -120,14 +119,12 @@ def export_records(modeladmin, request, queryset):
         form = XlsDataSyncOptionForm(request.POST, model=model)
         if form.is_valid():
             filename = form.cleaned_data['filename']
-            vba = form.cleaned_data['require_vba']
             fields = form.cleaned_data['columns']
             out = six.BytesIO()
-            process_model(model, out,
-                          fields=fields,
-                          queryset=queryset,
-                          options={'vba': vba},
-                          )
+            with XlsTemplate(out) as xls:
+                xls.process_model(model,
+                                  fields=fields,
+                                  queryset=queryset)
             out.seek(0)
             response = HttpResponse(out.read(),
                                     content_type="application/vnd.ms-excel"

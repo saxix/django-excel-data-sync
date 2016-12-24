@@ -3,11 +3,12 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import logging
+from six import python_2_unicode_compatible
 
 from django.core import validators
 from django.db import models
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import Field
+from django.utils.encoding import smart_str
 from excel_data_sync.validators import THIS_COL, RuleEngine
 
 logger = logging.getLogger(__name__)
@@ -78,6 +79,7 @@ fmts = [
 #         return ";".join(["{}:{}".format(k, v) for k, v in self.items()])
 
 
+@python_2_unicode_compatible
 class Header(object):
     format = {'bold': True,
               'locked': 1,
@@ -89,12 +91,16 @@ class Header(object):
         self.column = column
         self.title = column.verbose_name.title()
 
+    def __str__(self):
+        return smart_str("<Header {0.column.verbose_name}>".format(self))
+
     def get_format(self, book):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
         return book.add_format(fmt)
 
 
+@python_2_unicode_compatible
 class Column(object):
     format = {'locked': 0}
     num_format = ''
@@ -149,7 +155,7 @@ class Column(object):
                 self.min_value = validator.limit_value
                 self.rule_parser.append("min")
 
-    def process_workbook(self, book, sheet):
+    def process_workbook(self, sheet):
         sheet.data_validation(1, self.number,
                               65000, self.number,
                               self._get_validation())
@@ -193,10 +199,7 @@ class Column(object):
         raise AttributeError(item)  # pragma: no-cover
 
     def __repr__(self):
-        return """<Column {0.verbose_name}
-{0.blank}
-{0.null}
-{0.max_length}>""".format(self)
+        return smart_str("<{0.__class__.__name__} '{0.verbose_name}'>".format(self))
 
     def __str__(self):
         return """<Column {0.verbose_name}>""".format(self)
@@ -217,7 +220,7 @@ class DateTimeColumn(DateColumn):
 
     def get_value_from_object(self, record):
         v = super(DateColumn, self).get_value_from_object(record)
-        return v.astimezone(self.options['timezone']).replace(tzinfo=None)
+        return v.astimezone(self._sheet._book.timezone).replace(tzinfo=None)
 
 
 class TimeColumn(DateColumn):
@@ -319,9 +322,9 @@ class ForeignKeyColumn(Column):
     def get_value_from_object(self, record):
         return str(getattr(record, self.field.name))
 
-    def process_workbook(self, book, sheet):
+    def process_workbook(self, sheet):
         sheet_name = '{0.app_label}.{0.model_name}'.format(self.field.related_model._meta)
-        fksheet = book.add_worksheet(sheet_name)
+        fksheet = sheet._book.add_worksheet(sheet_name)
         fksheet.hide()
         for i, opt in enumerate([[x.pk, str(x)] for x in self.field.rel.model.objects.all()]):
             id, label = opt
@@ -336,7 +339,7 @@ class ForeignKeyColumn(Column):
                               )
 
     def _get_validation(self):
-        pass
+        return {}
 
 
 mapping = {models.Field: Column,
@@ -374,7 +377,7 @@ except AttributeError:
 
 
 def register_column(key, col):
-    if isinstance(key, Field):
+    if isinstance(key, models.Field):
         target = "{}.{}.{}".format(key.model._meta.app_label,
                                    key.model._meta.model_name,
                                    key.name).lower()
@@ -384,7 +387,7 @@ def register_column(key, col):
 
 
 def unregister_column(key):
-    if isinstance(key, Field):
+    if isinstance(key, models.Field):
         target = "{}.{}.{}".format(key.model._meta.app_label,
                                    key.model._meta.model_name,
                                    key.name).lower()

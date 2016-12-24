@@ -31,9 +31,9 @@ def inspect(model, global_options=None, fields=None, exclude=None):
     return columns, headers
 
 
-def process_model(model, filename=None, fields=None, exclude=None,
-                  queryset=None,
-                  options=None, properties=None):
+def xx_process_model(model, filename=None, fields=None, exclude=None,
+                     queryset=None,
+                     options=None, properties=None):
     with XlsTemplate(filename, options=options, properties=properties) as book:
         sheet = book.add_worksheet(model._meta.model_name)
 

@@ -4,7 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import logging
 from six import BytesIO as StringIO
 
-from django.db.models import Field, IntegerField, CharField, PositiveSmallIntegerField
+from django.db.models import Field, IntegerField, PositiveSmallIntegerField
 from excel_data_sync.columns import IntegerColumn, get_column
 from excel_data_sync.xls import XlsTemplate
 
@@ -25,10 +25,7 @@ def test_repr():
     c = get_column(f)
 
     assert str(c) == "<Column Field1>"
-    assert repr(c) == """<Column Field1
-False
-False
-None>"""
+    assert repr(c) == "<IntegerColumn 'Field1'>"
 
 
 def test_get_column():

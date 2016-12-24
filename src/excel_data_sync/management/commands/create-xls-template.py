@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.apps import apps
 from django.core.management.base import BaseCommand
-from excel_data_sync.inspector import process_model
+# from excel_data_sync.inspector import process_model
+from excel_data_sync.xls import XlsTemplate
 
 
 class Command(BaseCommand):
@@ -30,7 +31,8 @@ class Command(BaseCommand):
             qs = m.objects.all()
         else:
             qs = None
-        process_model(m, f, queryset=qs)
+        with XlsTemplate(f) as xls:
+            xls.process_model(m, queryset=qs)
         self.stdout.write("Saved..{}".format(f))
         if qs:
             self.stdout.write("Dumped {} records".format(qs.count()))

@@ -6,6 +6,7 @@ import logging
 from datetime import datetime
 from decimal import Decimal
 
+import pytz
 from django.contrib.auth.models import User
 from example.models import DemoModel, Option
 
@@ -33,7 +34,6 @@ def create_admin():
 
 choices = itertools.cycle(DemoModel.CHOICES)
 
-
 # ip = itertools.cycle([fake.ipv6(), '72.223.176.99'])
 # value_10 = itertools.cycle(range(9))
 # null_logic = itertools.cycle([None, True, False])
@@ -43,18 +43,18 @@ choices = itertools.cycle(DemoModel.CHOICES)
 # range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])
 # t = itertools.cycle(["08:00", "09:00"])
 #
+HOUR = 3600
+DAY = HOUR * 24
+
 
 def factory(r=1, **values):
-    # seed = values.pop('seed', None)
-    # fake.seed(seed)
-    # random.seed(seed)
 
     defaults = {
         'big_integer': r,
         'char': 'Name {}'.format(r),
         'choices': next(choices)[0],
-        'date': datetime.fromtimestamp(r * 1000000).date(),
-        'datetime': datetime.fromtimestamp(r * 1000000),
+        'date': datetime.fromtimestamp((r - 1) * DAY, tz=pytz.UTC).date(),
+        'datetime': datetime.fromtimestamp(r * DAY, tz=pytz.UTC),
         'decimal': Decimal(r),
         'email': '{}@email.com'.format(r),
         'float': 0.1 * r,
@@ -69,7 +69,7 @@ def factory(r=1, **values):
         'range_5_10': 5,
         'small_integer': '{}'.format(r),
         'text': 'a' * r,
-        'time': datetime.fromtimestamp(r * 1000000).time(),
+        'time': datetime.fromtimestamp(r * HOUR).time(),
         'unique': r,
         'url': 'http://nowhere.com/{}'.format(r),
         'uuid': '808506faa4174559a9ecba34ba3decef',

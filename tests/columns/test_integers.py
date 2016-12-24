@@ -8,12 +8,12 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import (BigIntegerField, Field, IntegerField,
                               PositiveIntegerField, PositiveSmallIntegerField,
-                              SmallIntegerField, )
-
+                              SmallIntegerField,)
 from example.models import DemoModel
 from excel_data_sync.columns import get_column
-from excel_data_sync.inspector import process_model
-from helperfunctions import get_target_xls, get_io, _compare_xlsx_files
+# from excel_data_sync.inspector import process_model
+from excel_data_sync.xls import XlsTemplate
+from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
 
 logger = logging.getLogger(__name__)
 
@@ -64,8 +64,9 @@ def test_validator_number_max_value(field):
 def test_write_xls(field):
     exp_filename = get_target_xls('cols/{}.xls'.format(field))
     io = get_io(exp_filename)
-    process_model(DemoModel, io,
-                  fields=[field])
+    with XlsTemplate(io) as xls:
+        xls.process_model(DemoModel,
+                          fields=[field])
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)
 
