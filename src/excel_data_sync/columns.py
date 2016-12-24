@@ -434,5 +434,5 @@ def get_column(field, options=None):
         klass = mapping.get(type(field), Column)
     try:
         return klass(field, options)
-    except TypeError:
+    except TypeError:  # pragma: no cover
         raise ValueError("unknown field {}".format(field))
