@@ -2,19 +2,20 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+
+import pytest
 from six import StringIO
 
-from django.db.models import IntegerField
-from excel_data_sync.columns import Column, Header
+from example.models import DemoModel
 from excel_data_sync.xls import XlsTemplate
 
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.django_db
 def test_base():
-    f = IntegerField('Field1')
-    c = Column(f)
-    h = Header(c)
-    book = XlsTemplate(StringIO())
+    with XlsTemplate(StringIO()) as xls:
+        xls.process_model(DemoModel)
 
-    assert h.get_format(book).num_format == ''
+    headers = xls.worksheets_objs[0].headers
+    assert headers[0].get_format().num_format == ''

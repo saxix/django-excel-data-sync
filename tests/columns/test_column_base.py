@@ -2,11 +2,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-from six import BytesIO as StringIO
 
 from django.db.models import Field, IntegerField, PositiveSmallIntegerField
 from excel_data_sync.columns import IntegerColumn, get_column
-from excel_data_sync.xls import XlsTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -41,13 +39,6 @@ def test_validation():
     assert v['validate'] == 'any'
     # assert v['value'] == '=AND(ISNUMBER(VALUE(THIS)))'
     # assert v['value'] == '=AND(ISNUMBER(VALUE(THIS)))'
-
-
-def test_format():
-    with XlsTemplate(StringIO()) as book:
-        f = IntegerField('Field1')
-        c = get_column(f)
-        assert c.get_format(book).num_format == c.num_format
 
 
 def test_unique():

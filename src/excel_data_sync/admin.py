@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import logging
 import six
 
+import pytz
 from django import forms
 from django.conf import settings
 from django.contrib.admin import helpers
@@ -27,14 +28,34 @@ except ImportError:
 
         return inner
 
-
 logger = logging.getLogger(__name__)
+
+DATE_FORMATS = ['DD-MMM-YYYY',
+                'M/D/YY',
+                'DD-MMM-YY',
+                'D-MMM',
+                'MMM-YY',
+                ]
+TIME_FORMATS = ['h:mm AM/PM',
+                'h:mm:ss AM/PM',
+                'h:mm',
+                'h:mm:ss',
+                ]
+DATETIME_FORMATS = ['DD-MMM-YYYY hh:mm',
+                    'DD-MM-YYYY hh:mm']
 
 
 class XlsDataSyncOptionForm(forms.Form):
     filename = forms.CharField(label=_('Filename'))
-    require_vba = forms.BooleanField(label=_('Require VBA'), required=False)
-    # timezone = forms.BooleanField(label=_('Require VBA'), required=False)
+    # require_vba = forms.BooleanField(label=_('Require VBA'), required=False)
+    timezone = forms.ChoiceField(choices=zip(pytz.all_timezones, pytz.all_timezones),
+                                 initial=settings.TIME_ZONE)
+    date_format = forms.ChoiceField(choices=zip(DATE_FORMATS, DATE_FORMATS),
+                                    initial=DATE_FORMATS[0])
+    datetime_format = forms.ChoiceField(choices=zip(DATETIME_FORMATS, DATETIME_FORMATS),
+                                        initial=DATETIME_FORMATS[0])
+    time_format = forms.ChoiceField(choices=zip(TIME_FORMATS, TIME_FORMATS),
+                                    initial=TIME_FORMATS[0])
     columns = forms.MultipleChoiceField(widget=FilteredSelectMultiple(
         _('Columns'),
         False,
@@ -73,8 +94,11 @@ class XlsDataSyncAdminMixin(ExtraUrlMixin):
             if form.is_valid():
                 filename = form.cleaned_data['filename']
                 fields = form.cleaned_data['columns']
+                timezone = form.cleaned_data['timezone']
+                date_format = form.cleaned_data['date_format']
                 out = six.BytesIO()
-                with XlsTemplate(out) as xls:
+                with XlsTemplate(out, {'default_date_format': date_format,
+                                       'timezone': timezone}) as xls:
                     xls.process_model(model,
                                       fields=fields)
                 out.seek(0)
@@ -85,7 +109,8 @@ class XlsDataSyncAdminMixin(ExtraUrlMixin):
                 return response
         else:
             filename = '{}.xls'.format(model._meta.model_name)
-            form = XlsDataSyncOptionForm(initial={'filename': filename, }, model=model)
+            form = XlsDataSyncOptionForm(initial={'filename': filename, },
+                                         model=model)
         media = self.media + form.media
         ctx = {
             'form': form,

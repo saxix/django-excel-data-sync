@@ -33,11 +33,20 @@ class XlsTemplate(Workbook):
 
     def __init__(self, filename=None, options=None, properties=None):
         options = options or {}
-        options.setdefault('default_date_format', 'D-MMM-YY')
+        options.setdefault('default_date_format', 'D-MMM-YYYY')
+        options.setdefault('default_datetime_format', 'DD MMM YYYY hh:mm')
+        options.setdefault('default_time_format', 'hh:mm:ss')
         self.strings_to_numbers = True
         self._vba_added = False
-        self.timezone = pytz.utc
+
+        # self.default_time_format =
+        # self.default_datetime_format = options.pop('default_datetime_format')
+        self.timezone = options.pop('timezone', pytz.utc)
+
         super(XlsTemplate, self).__init__(filename, options)
+        self.default_datetime_format = self.add_format({'num_format': options.pop('default_datetime_format')})
+        self.default_time_format = self.add_format({'num_format': options.pop('default_time_format')})
+
         if properties:
             self.set_properties(properties)
             # self.set_properties({
@@ -75,16 +84,22 @@ class XlsTemplate(Workbook):
             sheet.add_column(c)
 
         for i, header in enumerate(sheet.headers):
-            sheet.write(0, i, header.title, header.get_format(self))
+            sheet.write(0, i, header.title, header.get_format())
 
         for i, col in enumerate(sheet.columns):
             col.process_workbook(sheet)
 
+        # for row in range(1, 65000):
+        #     for column in sheet.columns:
+        #         column.format_cell(row, column.number)
+        # for row in range(1, 65000):
+        for column in sheet.columns:
+            column.format_column()
+
         if queryset:
             for row, record in enumerate(queryset, 1):
                 for colnum, column in enumerate(sheet.columns):
-                    v = column.get_value_from_object(record)
-                    sheet.write(row, colnum, v, column.get_format(self))
+                    column.write_cell(row, colnum, record)
 
     # def add_worksheet(self, name=None, worksheet_class=None):
     #     """

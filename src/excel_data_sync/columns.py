@@ -10,6 +10,7 @@ from django.db import models
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils.encoding import smart_str
 from excel_data_sync.validators import THIS_COL, RuleEngine
+from xlsxwriter.worksheet import convert_cell_args
 
 logger = logging.getLogger(__name__)
 
@@ -94,10 +95,10 @@ class Header(object):
     def __str__(self):
         return smart_str("<Header {0.column.verbose_name}>".format(self))
 
-    def get_format(self, book):
+    def get_format(self):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
-        return book.add_format(fmt)
+        return self.column._sheet._book.add_format(fmt)
 
 
 @python_2_unicode_compatible
@@ -119,7 +120,19 @@ class Column(object):
         self.max_value = None
         self.min_value = None
 
-    def get_value_from_object(self, record):
+    @convert_cell_args
+    def write_cell(self, row, col, record, *args):
+        v = self._get_value_from_object(record)
+        self._sheet.write(row, col, v, self.get_format())
+
+    @convert_cell_args
+    def format_column(self):
+        self._sheet.set_column(self.number,
+                               self.number, cell_format=self.get_format())
+
+        # self._sheet.write_blank(row, col, '', self.get_format(self._sheet._book))
+
+    def _get_value_from_object(self, record):
         if self.field.choices:
             getter = 'get_{}_display'.format(self.field.name)
             return getattr(record, getter)()
@@ -141,10 +154,10 @@ class Column(object):
         """
         return value
 
-    def get_format(self, book):
+    def get_format(self):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
-        return book.add_format(fmt)
+        return self._sheet._book.add_format(fmt)
 
     def parse_validators(self):
         for validator in self.field.validators:
@@ -209,8 +222,18 @@ class Column(object):
 
 
 class DateColumn(Column):
-    num_format = 'D MMM YYYY'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
+    format = {'locked': 0, }
+    # num_format = 'D MMM YYYY'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
     main_validator = ["date"]
+    _format_attr = 'default_date_format'
+
+    def get_format(self):
+        return getattr(self._sheet._book, self._format_attr)
+
+    @convert_cell_args
+    def write_cell(self, row, col, record, *args):
+        v = self._get_value_from_object(record)
+        self._sheet.write_datetime(row, col, v, self.get_format())
 
     def _get_validation(self):
         return {"validate": "date",
@@ -219,15 +242,17 @@ class DateColumn(Column):
 
 
 class DateTimeColumn(DateColumn):
-    num_format = 'D MMM YYYY h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
+    # num_format = 'D MMM YYYY h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
+    _format_attr = 'default_datetime_format'
 
-    def get_value_from_object(self, record):
-        v = super(DateColumn, self).get_value_from_object(record)
+    def _get_value_from_object(self, record):
+        v = super(DateColumn, self)._get_value_from_object(record)
         return v.astimezone(self._sheet._book.timezone).replace(tzinfo=None)
 
 
 class TimeColumn(DateColumn):
-    num_format = 'h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
+    # num_format = 'h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
+    _format_attr = 'default_time_format'
     main_validator = ["date"]
 
 
@@ -309,7 +334,7 @@ class IpAddressColumn(Column):
 class UUIDColumn(Column):
     num_format = 'general'
 
-    def get_value_from_object(self, record):
+    def _get_value_from_object(self, record):
         return getattr(record, self.field.name).hex
 
 
@@ -322,7 +347,7 @@ class EmailColumn(Column):
 
 
 class ForeignKeyColumn(Column):
-    def get_value_from_object(self, record):
+    def _get_value_from_object(self, record):
         return str(getattr(record, self.field.name))
 
     def process_workbook(self, sheet):
