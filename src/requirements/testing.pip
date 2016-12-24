@@ -11,3 +11,4 @@ pytest-echo
 pytest-pythonpath
 pytz
 tox>=1.7.0
+xlrd

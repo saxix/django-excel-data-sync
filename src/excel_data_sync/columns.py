@@ -120,6 +120,9 @@ class Column(object):
         self.min_value = None
 
     def get_value_from_object(self, record):
+        if self.field.choices:
+            getter = 'get_{}_display'.format(self.field.name)
+            return getattr(record, getter)()
         return getattr(record, self.field.name)
 
     def to_xls(self, value):

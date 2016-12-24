@@ -7,6 +7,8 @@ import logging
 import pytest
 import pytz
 from django.db.models import DateField, DateTimeField, TimeField
+from xlrd import xldate_as_tuple
+
 from example.management.demo import factory
 from example.models import DemoModel, Option
 from excel_data_sync.columns import get_column
@@ -30,7 +32,6 @@ def test_validator_date_base(field):
 @pytest.mark.parametrize("field", ["datetime", "date"])
 @pytest.mark.django_db
 def test_write_xls(field):
-    # tz = pytz.timezone('Europe/Rome')
     tz = pytz.timezone('UTC')
     factory(datetime=datetime.datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz),
             date=datetime.datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz).date(),
@@ -48,22 +49,37 @@ def test_write_xls(field):
     assert got == exp
 
 
-@pytest.mark.parametrize("field", ["datetime", "date"])
+# @pytest.mark.parametrize("field", ["datetime", "date"])
 @pytest.mark.django_db
-def test_write_timezone(field):
+def test_write_timezone():
     tz = pytz.timezone('Europe/Rome')
     d = datetime.datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz)
+
     factory(datetime=d,
             date=d.date(),
             option=Option.objects.get_or_create(name='Option 1')[0])
 
-    exp_filename = get_target_xls('cols/{}_tz.xls'.format(field))
+    exp_filename = get_target_xls('cols/dates_tz.xls')
     io = get_io(exp_filename)
     with XlsTemplate(io) as xls:
         xls.process_model(DemoModel,
-                          fields=[field],
+                          fields=['date', 'datetime'],
                           queryset=DemoModel.objects.all())
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)
 
     assert got == exp
+
+    from xlrd import open_workbook
+    wb = open_workbook(exp_filename)
+
+    sheet = wb.sheets()[0]
+    assert sheet.nrows == 2
+    assert sheet.ncols == 2
+
+    cell_value = xldate_as_tuple(sheet.cell(1,0).value, wb.datemode)
+    assert datetime.datetime(*cell_value) == d.replace(tzinfo=None)
+
+    cell_value = xldate_as_tuple(sheet.cell(1,1).value, wb.datemode)
+    expected = d.astimezone(pytz.utc).replace(tzinfo=None)
+    assert datetime.datetime(*cell_value) == expected

@@ -75,6 +75,8 @@ def factory(r=1, **values):
         'uuid': '808506faa4174559a9ecba34ba3decef',
     }
     defaults.update(values)
+    if not defaults['option']:
+        defaults['option'] = Option.objects.get_or_create(name="Option 1")[0]
     try:
         m = DemoModel.objects.get(id=r)
     except DemoModel.DoesNotExist:

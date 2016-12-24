@@ -34,6 +34,7 @@ class XlsTemplate(Workbook):
 
     def __init__(self, filename=None, options=None, properties=None):
         options = options or {}
+        options.setdefault('default_date_format','D-MMM-YY')
         self.strings_to_numbers = True
         self._vba_added = False
         self.timezone = pytz.utc
@@ -63,13 +64,14 @@ class XlsTemplate(Workbook):
     def process_model(self, model, fields=None, exclude=None, queryset=None):
         sheet = self.add_worksheet(model._meta.model_name)
         meta = model._meta
+        if fields is None:
+            fields = [field.name for field in meta.get_fields()]
         if exclude is None:
             exclude = []
-        for field in meta.get_fields():
-            if field.name in exclude:
+        for field_name in fields:
+            if field_name in exclude:
                 continue
-            if fields and field.name not in fields:
-                continue
+            field = meta.get_field(field_name)
             c = get_column(field)
             sheet.add_column(c)
 
@@ -85,29 +87,22 @@ class XlsTemplate(Workbook):
                     v = column.get_value_from_object(record)
                     sheet.write(row, colnum, v, column.get_format(self))
 
-    def add_worksheet(self, name=None, worksheet_class=None):
-        """
-        Add a new worksheet to the Excel workbook.
-
-        Args:
-            name: The worksheet name. Defaults to 'Sheet1', etc.
-
-        Returns:
-            Reference to a worksheet object.
-
-        """
-        if worksheet_class is None:
-            worksheet_class = self.worksheet_class
-        return self._add_sheet(name, is_chartsheet=False, worksheet_class=worksheet_class)
+    # def add_worksheet(self, name=None, worksheet_class=None):
+    #     """
+    #     Add a new worksheet to the Excel workbook.
+    #
+    #     Args:
+    #         name: The worksheet name. Defaults to 'Sheet1', etc.
+    #
+    #     Returns:
+    #         Reference to a worksheet object.
+    #
+    #     """
+    #     if worksheet_class is None:
+    #         worksheet_class = self.worksheet_class
+    #     return self._add_sheet(name, is_chartsheet=False, worksheet_class=worksheet_class)
 
     def _add_sheet(self, name, is_chartsheet=None, worksheet_class=None):
-        if is_chartsheet is not None:
-            warnings.warn(
-                "'is_chartsheet' has been deprecated and "
-                "will be removed in the next versions. Use proper 'worksheet_class' to get same result",
-                PendingDeprecationWarning)
-        if is_chartsheet is None and worksheet_class is None:
-            raise ValueError("You must provide 'is_chartsheet' or 'worksheet_class'")
         if worksheet_class:
             worksheet = worksheet_class()
         else:
