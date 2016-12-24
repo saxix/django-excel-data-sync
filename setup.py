@@ -73,6 +73,7 @@ setup(
     include_package_data=True,
     install_requires=install_requires,
     extras_require={
+        'django': ["django>=1.8,<=1.10"],
         'dev': dev_requires,
         'test': tests_requires,
         'admin': ['admin-extra-urls']
@@ -92,6 +93,7 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',

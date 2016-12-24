@@ -7,13 +7,12 @@ import logging
 import pytest
 import pytz
 from django.db.models import DateField, DateTimeField, TimeField
-from xlrd import xldate_as_tuple
-
 from example.management.demo import factory
 from example.models import DemoModel, Option
 from excel_data_sync.columns import get_column
 from excel_data_sync.xls import XlsTemplate
 from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
+from xlrd import xldate_as_tuple
 
 logger = logging.getLogger(__name__)
 
@@ -77,9 +76,9 @@ def test_write_timezone():
     assert sheet.nrows == 2
     assert sheet.ncols == 2
 
-    cell_value = xldate_as_tuple(sheet.cell(1,0).value, wb.datemode)
+    cell_value = xldate_as_tuple(sheet.cell(1, 0).value, wb.datemode)
     assert datetime.datetime(*cell_value) == d.replace(tzinfo=None)
 
-    cell_value = xldate_as_tuple(sheet.cell(1,1).value, wb.datemode)
+    cell_value = xldate_as_tuple(sheet.cell(1, 1).value, wb.datemode)
     expected = d.astimezone(pytz.utc).replace(tzinfo=None)
     assert datetime.datetime(*cell_value) == expected

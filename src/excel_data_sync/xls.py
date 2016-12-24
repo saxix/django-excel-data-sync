@@ -2,7 +2,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-import warnings
 
 import pytz
 from excel_data_sync.columns import Header, get_column
@@ -34,7 +33,7 @@ class XlsTemplate(Workbook):
 
     def __init__(self, filename=None, options=None, properties=None):
         options = options or {}
-        options.setdefault('default_date_format','D-MMM-YY')
+        options.setdefault('default_date_format', 'D-MMM-YY')
         self.strings_to_numbers = True
         self._vba_added = False
         self.timezone = pytz.utc

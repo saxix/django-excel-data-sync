@@ -66,7 +66,7 @@ Ready to contribute? Here's how to set up `django-excel-datasync` for local deve
 
     $ mkvirtualenv django-excel-datasync
     $ cd django-excel-datasync/
-    $ python setup.py develop
+    $ pip install -e .[dev]
 
 4. Create a branch for local development::
 
@@ -78,6 +78,7 @@ Ready to contribute? Here's how to set up `django-excel-datasync` for local deve
    tests, including testing other Python versions with tox::
 
         $ flake8 src tests
+        $ isort -rc -c src/ tests/
         $ python setup.py test
         $ tox
 

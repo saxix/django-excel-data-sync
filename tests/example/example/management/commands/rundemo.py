@@ -2,7 +2,6 @@
 from django.contrib.staticfiles.management.commands.runserver import \
     Command as RunServer
 from django.core.management import call_command
-
 from example.management.demo import create_admin, create_sample_data
 from example.models import DemoModel
 
