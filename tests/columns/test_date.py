@@ -59,6 +59,12 @@ def test_validator_date_range():
     assert v['criteria'] == 'between'
     assert v['value'] == limits[0]
     assert v['maximum'] == limits[1]
+
+    f = DateField()
+    v = get_column(f)._get_validation()
+    assert v['validate'] == 'date'
+    assert v['criteria'] == '>='
+    assert v['value'] == datetime(1900, 1, 1, 0, 0)
     # assert v["error_message"] == "Enter a value between {} and {}".format(*limits)
     # assert v['value'] == '=AND(ISDATE(VALUE(THIS)),VALUE(THIS)>={},VALUE(THIS)<={})'.format(*limits)
 

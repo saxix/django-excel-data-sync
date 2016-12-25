@@ -104,7 +104,7 @@ Project links
 +--------------------+---------------+--------------------------------------------+
 | Issue tracker:     |https://github.com/saxix/django-excel-data-sync/issues?sort |
 +--------------------+---------------+--------------------------------------------+
-| Download:          |http://pypi.python.org/pypi/django-excel-data-sync/         |
+| Download:          |https://pypi.python.org/pypi/django-excel-data-sync/         |
 +--------------------+---------------+--------------------------------------------+
 | Documentation:     |https://django-excel-data-sync.readthedocs.org/en/latest/   |
 +--------------------+---------------+--------------+-----------------------------+

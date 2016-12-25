@@ -224,7 +224,7 @@ class Column(object):
 class DateColumn(Column):
     format = {'locked': 0, }
     # num_format = 'D MMM YYYY'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
-    main_validator = ["date"]
+    # main_validator = ["date"]
     _format_attr = 'default_date_format'
 
     def get_format(self):
