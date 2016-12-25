@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+from datetime import datetime
 from six import python_2_unicode_compatible
 
 from django.contrib.auth.models import User
@@ -37,6 +38,9 @@ class DemoModel(models.Model):
     small_integer = models.SmallIntegerField()
     positive_small_integer = models.PositiveSmallIntegerField()
     null_boolean = models.NullBooleanField(default=None)
+    date_range = models.DateField(validators=[MinValueValidator(datetime(2000, 1, 1).date()),
+                                              MaxValueValidator(datetime(2000, 12, 31).date()),
+                                              ])
     date = models.DateField()
     datetime = models.DateTimeField()
     time = models.TimeField()

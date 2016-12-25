@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # from __future__ import absolute_import, unicode_literals
 
-import datetime
+from datetime import datetime
 import logging
 
 import pytest
 import pytz
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import DateField, DateTimeField, TimeField
 from example.management.demo import factory
 from example.models import DemoModel, Option
@@ -25,15 +26,66 @@ def test_validator_date_base(field):
     v = c._get_validation()
     assert v['validate'] == 'date'
     assert v['criteria'] == '>='
-    assert v['value'] == datetime.datetime(1900, 1, 1, 0, 0, 0, 0)
+    assert v['value'] == datetime(1900, 1, 1, 0, 0, 0, 0)
+
+
+@pytest.mark.django_db
+def test_validator_date_min():
+    limits = datetime(2000, 1, 1).date(), datetime(2000, 12, 31).date()
+    f = DateField(validators=[MinValueValidator(limits[0])])
+    v = get_column(f)._get_validation()
+    assert v['validate'] == 'date'
+    assert v['criteria'] == '>='
+    assert v['value'] == limits[0]
+
+
+@pytest.mark.django_db
+def test_validator_date_max():
+    limits = datetime(2000, 1, 1).date(), datetime(2000, 12, 31).date()
+    f = DateField(validators=[MaxValueValidator(limits[0])])
+    v = get_column(f)._get_validation()
+    assert v['validate'] == 'date'
+    assert v['criteria'] == '<='
+    assert v['value'] == limits[0]
+
+
+@pytest.mark.django_db
+def test_validator_date_range():
+    limits = datetime(2000, 1, 1).date(), datetime(2000, 12, 31).date()
+    f = DateField(validators=[MinValueValidator(limits[0]),
+                              MaxValueValidator(limits[1])])
+    v = get_column(f)._get_validation()
+    assert v['validate'] == 'date'
+    assert v['criteria'] == 'between'
+    assert v['value'] == limits[0]
+    assert v['maximum'] == limits[1]
+    # assert v["error_message"] == "Enter a value between {} and {}".format(*limits)
+    # assert v['value'] == '=AND(ISDATE(VALUE(THIS)),VALUE(THIS)>={},VALUE(THIS)<={})'.format(*limits)
+
+    # factory()
+    # exp_filename = get_target_xls('cols/date_max_min.xls')
+    # io = get_io(exp_filename)
+    # with XlsTemplate(io) as xls:
+    #     xls.process_model(DemoModel,
+    #                       fields=['date_range'],
+    #                       queryset=DemoModel.objects.all())
+
+    # col = xls.worksheets()[0].columns[0]
+    # v = col._get_validation()
+    # assert v == {u'value': datetime.datetime(1900, 1, 1, 0, 0), u'validate': u'date', u'criteria': u'>='}
+    # FIXME: remove this line
+    # import pdb; pdb.set_trace()
+    #
+    # got, exp = _compare_xlsx_files(io, exp_filename)
+    # assert got == exp
 
 
 @pytest.mark.parametrize("field", ["datetime", "date"])
 @pytest.mark.django_db
 def test_write_xls(field):
     tz = pytz.timezone('UTC')
-    factory(datetime=datetime.datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz),
-            date=datetime.datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz).date(),
+    factory(datetime=datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz),
+            date=datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz).date(),
             option=Option.objects.get_or_create(name='Option 1')[0])
 
     exp_filename = get_target_xls('cols/{}.xls'.format(field))
@@ -52,7 +104,7 @@ def test_write_xls(field):
 @pytest.mark.django_db
 def test_write_timezone():
     tz = pytz.timezone('Europe/Rome')
-    d = datetime.datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz)
+    d = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=tz)
 
     factory(datetime=d,
             date=d.date(),
@@ -77,8 +129,8 @@ def test_write_timezone():
     assert sheet.ncols == 2
 
     cell_value = xldate_as_tuple(sheet.cell(1, 0).value, wb.datemode)
-    assert datetime.datetime(*cell_value) == d.replace(tzinfo=None)
+    assert datetime(*cell_value) == d.replace(tzinfo=None)
 
     cell_value = xldate_as_tuple(sheet.cell(1, 1).value, wb.datemode)
     expected = d.astimezone(pytz.utc).replace(tzinfo=None)
-    assert datetime.datetime(*cell_value) == expected
+    assert datetime(*cell_value) == expected

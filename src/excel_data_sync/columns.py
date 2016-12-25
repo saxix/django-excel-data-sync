@@ -171,10 +171,10 @@ class Column(object):
                 self.min_value = validator.limit_value
                 self.rule_parser.append("min")
 
-    def process_workbook(self, sheet):
-        sheet.data_validation(1, self.number,
-                              65000, self.number,
-                              self._get_validation())
+    def process_workbook(self):
+        self._sheet.data_validation(1, self.number,
+                                    65000, self.number,
+                                    self._get_validation())
 
     def _get_validation(self):
         try:
@@ -236,9 +236,26 @@ class DateColumn(Column):
         self._sheet.write_datetime(row, col, v, self.get_format())
 
     def _get_validation(self):
+        self.parse_validators()
+        value = datetime.datetime(1900, 1, 1)
+        criteria = ">="
+        maximum = None
+        if self.rule_parser:
+            if "min" in self.rule_parser and "max" in self.rule_parser:
+                criteria = "between"
+                value = self.min_value
+                maximum = self.max_value
+            elif "min" in self.rule_parser:
+                criteria = ">="
+                value = self.min_value
+            elif "max" in self.rule_parser:
+                criteria = "<="
+                value = self.max_value
+
         return {"validate": "date",
-                "criteria": ">=",
-                "value": datetime.datetime(1900, 1, 1)}
+                "criteria": criteria,
+                "value": value,
+                "maximum": maximum}
 
 
 class DateTimeColumn(DateColumn):
@@ -350,21 +367,21 @@ class ForeignKeyColumn(Column):
     def _get_value_from_object(self, record):
         return str(getattr(record, self.field.name))
 
-    def process_workbook(self, sheet):
+    def process_workbook(self):
         sheet_name = '{0.app_label}.{0.model_name}'.format(self.field.related_model._meta)
-        fksheet = sheet._book.add_worksheet(sheet_name)
+        fksheet = self._sheet._book.add_worksheet(sheet_name)
         fksheet.hide()
         for i, opt in enumerate([[x.pk, str(x)] for x in self.field.rel.model.objects.all()]):
             id, label = opt
             fksheet.write(i, 0, id)
             fksheet.write(i, 1, label)
-        sheet.data_validation(1, self.number,
-                              65000, self.number,
-                              {"validate": "list",
-                               "dropdown": True,
-                               "value": "=example.option!$B:$B"
-                               }
-                              )
+        self._sheet.data_validation(1, self.number,
+                                    65000, self.number,
+                                    {"validate": "list",
+                                     "dropdown": True,
+                                     "value": "=example.option!$B:$B"
+                                     }
+                                    )
 
     def _get_validation(self):
         return {}

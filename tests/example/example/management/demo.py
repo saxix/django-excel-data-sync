@@ -48,13 +48,13 @@ DAY = HOUR * 24
 
 
 def factory(r=1, **values):
-
     defaults = {
         'big_integer': r,
         'char': 'Name {}'.format(r),
         'choices': next(choices)[0],
         'date': datetime.fromtimestamp((r - 1) * DAY, tz=pytz.UTC).date(),
         'datetime': datetime.fromtimestamp(r * DAY, tz=pytz.UTC),
+        'date_range': datetime(2000, 1, 1).date(),
         'decimal': Decimal(r),
         'email': '{}@email.com'.format(r),
         'float': 0.1 * r,

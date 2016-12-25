@@ -87,7 +87,7 @@ class XlsTemplate(Workbook):
             sheet.write(0, i, header.title, header.get_format())
 
         for i, col in enumerate(sheet.columns):
-            col.process_workbook(sheet)
+            col.process_workbook()
 
         # for row in range(1, 65000):
         #     for column in sheet.columns:
