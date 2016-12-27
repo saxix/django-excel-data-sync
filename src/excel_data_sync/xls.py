@@ -2,12 +2,15 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+from warnings import warn
 
 import pytz
 from excel_data_sync.columns import Header, get_column
 from xlsxwriter import Workbook
 from xlsxwriter.chartsheet import Chartsheet
-from xlsxwriter.worksheet import Worksheet
+from xlsxwriter.compatibility import force_unicode
+from xlsxwriter.utility import supported_datetime
+from xlsxwriter.worksheet import Worksheet, convert_range_args
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +28,245 @@ class XlsWorkSheet(Worksheet):
         if not header:
             header = Header(column)
         self.headers.append(header)
+
+    @convert_range_args
+    def data_validation(self, first_row, first_col, last_row, last_col,
+                        options):
+        """
+        Add a data validation to a worksheet.
+
+        Args:
+            first_row:    The first row of the cell range. (zero indexed).
+            first_col:    The first column of the cell range.
+            last_row:     The last row of the cell range. (zero indexed).
+            last_col:     The last column of the cell range.
+            options:      Data validation options.
+
+        Returns:
+            0:  Success.
+            -1: Row or column is out of worksheet bounds.
+            -2: Incorrect parameter or option.
+        """
+        # Check that row and col are valid without storing the values.
+        if self._check_dimensions(first_row, first_col, True, True):
+            return -1
+        if self._check_dimensions(last_row, last_col, True, True):
+            return -1
+
+        # List of valid input parameters.
+        valid_parameters = {
+            'validate': True,
+            'criteria': True,
+            'value': True,
+            'source': True,
+            'minimum': True,
+            'maximum': True,
+            'ignore_blank': True,
+            'dropdown': True,
+            'show_input': True,
+            'input_title': True,
+            'input_message': True,
+            'show_error': True,
+            'error_title': True,
+            'error_message': True,
+            'error_type': True,
+            'other_cells': True,
+        }
+
+        # Check for valid input parameters.
+        for param_key in options.keys():
+            if param_key not in valid_parameters:
+                warn("Unknown parameter '%s' in data_validation()" % param_key)
+                return -2
+
+        # Map alternative parameter names 'source' or 'minimum' to 'value'.
+        if 'source' in options:
+            options['value'] = options['source']
+        if 'minimum' in options:
+            options['value'] = options['minimum']
+
+        # 'validate' is a required parameter.
+        if 'validate' not in options:
+            warn("Parameter 'validate' is required in data_validation()")
+            return -2
+
+        # List of  valid validation types.
+        valid_types = {
+            'any': 'none',
+            'any value': 'none',
+            'whole number': 'whole',
+            'whole': 'whole',
+            'integer': 'whole',
+            'decimal': 'decimal',
+            'list': 'list',
+            'date': 'date',
+            'time': 'time',
+            'text length': 'textLength',
+            'length': 'textLength',
+            'custom': 'custom',
+        }
+
+        # Check for valid validation types.
+        if not options['validate'] in valid_types:
+            warn("Unknown validation type '%s' for parameter "
+                 "'validate' in data_validation()" % options['validate'])
+            return -2
+        else:
+            options['validate'] = valid_types[options['validate']]
+
+        # No action is required for validation type 'any' if there are no
+        # input messages to display.
+        if (options['validate'] == 'none'
+            and options.get('input_title') is None
+            and options.get('input_message') is None):
+            return -2
+
+        # The any, list and custom validations don't have a criteria so we use
+        # a default of 'between'.
+        if (options['validate'] == 'none'
+            or options['validate'] == 'list'
+            or options['validate'] == 'custom'):
+            options['criteria'] = 'between'
+            options['maximum'] = None
+
+        # 'criteria' is a required parameter.
+        if 'criteria' not in options:
+            warn("Parameter 'criteria' is required in data_validation()")
+            return -2
+
+        # List of valid criteria types.
+        criteria_types = {
+            'between': 'between',
+            'not between': 'notBetween',
+            'equal to': 'equal',
+            '=': 'equal',
+            '==': 'equal',
+            'not equal to': 'notEqual',
+            '!=': 'notEqual',
+            '<>': 'notEqual',
+            'greater than': 'greaterThan',
+            '>': 'greaterThan',
+            'less than': 'lessThan',
+            '<': 'lessThan',
+            'greater than or equal to': 'greaterThanOrEqual',
+            '>=': 'greaterThanOrEqual',
+            'less than or equal to': 'lessThanOrEqual',
+            '<=': 'lessThanOrEqual',
+        }
+
+        # Check for valid criteria types.
+        if not options['criteria'] in criteria_types:
+            warn("Unknown criteria type '%s' for parameter "
+                 "'criteria' in data_validation()" % options['criteria'])
+            return -2
+        else:
+            options['criteria'] = criteria_types[options['criteria']]
+
+        # 'Between' and 'Not between' criteria require 2 values.
+        if (options['criteria'] == 'between' or
+                    options['criteria'] == 'notBetween'):
+            if 'maximum' not in options:
+                warn("Parameter 'maximum' is required in data_validation() "
+                     "when using 'between' or 'not between' criteria")
+                return -2
+        else:
+            options['maximum'] = None
+
+        # List of valid error dialog types.
+        error_types = {
+            'stop': 0,
+            'warning': 1,
+            'information': 2,
+        }
+
+        # Check for valid error dialog types.
+        if 'error_type' not in options:
+            options['error_type'] = 0
+        elif not options['error_type'] in error_types:
+            warn("Unknown criteria type '%s' for parameter 'error_type' "
+                 "in data_validation()" % options['error_type'])
+            return -2
+        else:
+            options['error_type'] = error_types[options['error_type']]
+
+        # Convert date/times value if required.
+        if options['validate'] == 'date' or options['validate'] == 'time':
+
+            if options['value']:
+                if not supported_datetime(options['value']):
+                    warn("Data validation 'value/minimum' must be a "
+                         "datetime object.")
+                    return -2
+                else:
+                    date_time = self._convert_date_time(options['value'])
+                    if date_time == 0.0 and options['validate'] == 'date':
+                        date_time = 1
+                    # Format date number to the same precision as Excel.
+                    options['value'] = "%.16g" % date_time
+
+            if options['maximum']:
+                if not supported_datetime(options['maximum']):
+                    warn("Conditional format 'maximum' must be a "
+                         "datetime object.")
+                    return -2
+                else:
+                    date_time = self._convert_date_time(options['maximum'])
+                    options['maximum'] = "%.16g" % date_time
+
+        # Check that the input title doesn't exceed the maximum length.
+        if options.get('input_title') and len(options['input_title']) > 32:
+            warn("Length of input title '%s' exceeds Excel's limit of 32"
+                 % force_unicode(options['input_title']))
+            return -2
+
+        # Check that the error title doesn't exceed the maximum length.
+        if options.get('error_title') and len(options['error_title']) > 32:
+            warn("Length of error title '%s' exceeds Excel's limit of 32"
+                 % force_unicode(options['error_title']))
+            return -2
+
+        # Check that the input message doesn't exceed the maximum length.
+        if (options.get('input_message')
+            and len(options['input_message']) > 255):
+            warn("Length of input message '%s' exceeds Excel's limit of 255"
+                 % force_unicode(options['input_message']))
+            return -2
+
+        # Check that the error message doesn't exceed the maximum length.
+        if (options.get('error_message')
+            and len(options['error_message']) > 255):
+            warn("Length of error message '%s' exceeds Excel's limit of 255"
+                 % force_unicode(options['error_message']))
+            return -2
+
+        # Check that the input list doesn't exceed the maximum length.
+        if options['validate'] == 'list' and type(options['value']) is list:
+            formula = self._csv_join(*options['value'])
+            if len(formula) > 255:
+                warn("Length of list items '%s' exceeds Excel's limit of "
+                     "255, use a formula range instead"
+                     % force_unicode(formula))
+                return -2
+
+        # Set some defaults if they haven't been defined by the user.
+        if 'ignore_blank' not in options:
+            options['ignore_blank'] = 1
+        if 'dropdown' not in options:
+            options['dropdown'] = 1
+        if 'show_input' not in options:
+            options['show_input'] = 1
+        if 'show_error' not in options:
+            options['show_error'] = 1
+
+        # These are the cells to which the validation is applied.
+        options['cells'] = [[first_row, first_col, last_row, last_col]]
+
+        # A (for now) undocumented parameter to pass additional cell ranges.
+        if 'other_cells' in options:
+            options['cells'].extend(options['other_cells'])
+
+        # Store the validation information until we close the worksheet.
+        self.validations.append(options)
 
 
 class XlsTemplate(Workbook):

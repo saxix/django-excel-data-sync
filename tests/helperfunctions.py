@@ -249,3 +249,18 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements=[])
 
     # If we got here the files are the same.
     return 'Ok', 'Ok'
+
+
+def _check_format(xls_file):
+    try:
+        # Open the Excel as a zip file for testing.
+        exp_zip = ZipFile(xls_file, 'r')
+    except IOError:
+        e = sys.exc_info()[1]
+        error = "Excel file error: " + str(e)
+        return error, ''
+    except (BadZipfile, LargeZipFile):
+        e = sys.exc_info()[1]
+        error = "Excel zipfile error, '" + xls_file + "': " + str(e)
+        return error, ''
+    exp_zip.extractall(os.path.join(os.path.dirname(xls_file), 'aaa'))

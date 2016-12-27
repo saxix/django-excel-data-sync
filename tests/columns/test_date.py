@@ -13,7 +13,7 @@ from example.models import DemoModel, Option
 from excel_data_sync.columns import get_column
 from excel_data_sync.xls import XlsTemplate
 from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
-from xlrd import xldate_as_tuple
+# from xlrd import xldate_as_tuple
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ def test_validator_date_base(field):
     c = get_column(f)
     c.book = XlsTemplate()
     v = c._get_validation()
-    assert v['validate'] == 'date'
+    assert v['validate'] == c.validate
     assert v['criteria'] == '>='
     assert v['value'] == datetime(1900, 1, 1, 0, 0, 0, 0)
 
@@ -127,7 +127,7 @@ def test_write_timezone():
 
     assert got == exp
 
-    from xlrd import open_workbook
+    from xlrd import open_workbook, xldate_as_tuple
     wb = open_workbook(exp_filename)
 
     sheet = wb.sheets()[0]

@@ -226,6 +226,8 @@ class DateColumn(Column):
     # num_format = 'D MMM YYYY'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
     # main_validator = ["date"]
     _format_attr = 'default_date_format'
+    validate = "date"
+    epoch = datetime.datetime(1900, 1, 1)
 
     def get_format(self):
         return getattr(self._sheet._book, self._format_attr)
@@ -237,7 +239,7 @@ class DateColumn(Column):
 
     def _get_validation(self):
         self.parse_validators()
-        value = datetime.datetime(1900, 1, 1)
+        value = self.epoch
         criteria = ">="
         maximum = None
         if self.rule_parser:
@@ -252,7 +254,7 @@ class DateColumn(Column):
                 criteria = "<="
                 value = self.max_value
 
-        return {"validate": "date",
+        return {"validate": self.validate,
                 "criteria": criteria,
                 "value": value,
                 "maximum": maximum}
@@ -261,6 +263,7 @@ class DateColumn(Column):
 class DateTimeColumn(DateColumn):
     # num_format = 'D MMM YYYY h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
     _format_attr = 'default_datetime_format'
+    validate = "date"
 
     def _get_value_from_object(self, record):
         v = super(DateColumn, self)._get_value_from_object(record)
@@ -270,7 +273,7 @@ class DateTimeColumn(DateColumn):
 class TimeColumn(DateColumn):
     # num_format = 'h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
     _format_attr = 'default_time_format'
-    main_validator = ["date"]
+    validate = "time"
 
 
 class NumberColumn(Column):
