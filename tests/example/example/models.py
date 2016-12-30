@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 from datetime import datetime
 from six import python_2_unicode_compatible
 
+from concurrency.fields import IntegerVersionField
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -57,6 +58,8 @@ class DemoModel(models.Model):
     not_editable = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     option = models.ForeignKey(Option)
+    # extras
+    version = IntegerVersionField()
 
     class Meta:
         app_label = 'example'

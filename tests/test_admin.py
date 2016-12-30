@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+import os
 import six
 
 import pytest
@@ -43,7 +44,8 @@ def test_export_template(app, admin_user, data):
 
     exp_filename = get_target_xls('admin_export.xls')
     io = six.BytesIO(res.content)
-    # open(exp_filename, 'wb').write(io.read())
+    if not os.path.exists(exp_filename):
+        open(exp_filename, 'wb').write(io.read())
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)
 
@@ -68,7 +70,8 @@ def test_export_records(app, admin_user, data):
 
     exp_filename = get_target_xls('admin_export_records.xls')
     io = six.BytesIO(res.content)
-    # open(exp_filename, 'wb').write(io.read())
+    if not os.path.exists(exp_filename):
+        open(exp_filename, 'wb').write(io.read())
     assert res.status_code == 200
     assert res['Content-Type'] == 'application/vnd.ms-excel'
 

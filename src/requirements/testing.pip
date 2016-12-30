@@ -1,5 +1,6 @@
-coverage==4.2
 codecov
+coverage==4.2
+django-concurrency
 django-webtest
 django_coverage_plugin
 flake8>=2.1.0

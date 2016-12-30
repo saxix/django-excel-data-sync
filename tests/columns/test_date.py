@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 # from __future__ import absolute_import, unicode_literals
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 import pytest
 import pytz
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import DateField, DateTimeField, TimeField
 from example.management.demo import factory
 from example.models import DemoModel, Option
 from excel_data_sync.columns import get_column
 from excel_data_sync.xls import XlsTemplate
 from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
+
 # from xlrd import xldate_as_tuple
 
 logger = logging.getLogger(__name__)
@@ -103,7 +104,7 @@ def test_write_xls(field):
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)
 
-    assert got == exp
+    assert got == exp, "{} does not match".format(exp_filename)
 
 
 # @pytest.mark.parametrize("field", ["datetime", "date"])

@@ -2,10 +2,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-
-import pytest
 from six import BytesIO
 
+import pytest
 from example.models import DemoModel
 from excel_data_sync.xls import XlsTemplate
 
