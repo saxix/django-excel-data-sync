@@ -154,9 +154,10 @@ class Column(object):
         """
         return value
 
-    def get_format(self):
+    def get_format(self, **kwargs):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
+        fmt.update(kwargs)
         return self._sheet._book.add_format(fmt)
 
     def parse_validators(self):
@@ -317,6 +318,12 @@ class AutoColumn(NumberColumn):
     def __init__(self, field, options=None):
         super(NumberColumn, self).__init__(field, options)
         self.min_value, self.max_value = BaseDatabaseOperations.integer_field_ranges[self.as_internal_type]
+
+    @convert_cell_args
+    def write_cell(self, row, col, record, *args):
+        v = self._get_value_from_object(record)
+        self._sheet.write(row, col, v, self.get_format(locked=1))
+
 
 
 class BigAutoColumn(AutoColumn):

@@ -4,10 +4,13 @@ from __future__ import absolute_import, unicode_literals
 import logging
 
 import pytz
+from datetime import datetime
+
 from excel_data_sync.columns import Header, get_column
 from xlsxwriter import Workbook
 from xlsxwriter.chartsheet import Chartsheet
 from xlsxwriter.worksheet import Worksheet
+
 logger = logging.getLogger(__name__)
 
 
@@ -38,8 +41,6 @@ class XlsTemplate(Workbook):
         self.strings_to_numbers = True
         self._vba_added = False
 
-        # self.default_time_format =
-        # self.default_datetime_format = options.pop('default_datetime_format')
         self.timezone = options.pop('timezone', pytz.utc)
 
         super(XlsTemplate, self).__init__(filename, options)
@@ -59,7 +60,7 @@ class XlsTemplate(Workbook):
             # 'status': '',
             # 'comments': 'Created with Python and XlsxWriter'
         # })
-        # self.set_custom_property("Creation Date", datetime.today(), "date")
+        self.set_custom_property("Creation Date", datetime.today(), "date")
 
         self.define_name('THIS', '=!A1')
         self.define_name('THIS_COL', '=!A')
@@ -88,10 +89,6 @@ class XlsTemplate(Workbook):
         for i, col in enumerate(sheet.columns):
             col.process_workbook()
 
-        # for row in range(1, 65000):
-        #     for column in sheet.columns:
-        #         column.format_cell(row, column.number)
-        # for row in range(1, 65000):
         for column in sheet.columns:
             column.format_column()
 
@@ -99,21 +96,6 @@ class XlsTemplate(Workbook):
             for row, record in enumerate(queryset, 1):
                 for colnum, column in enumerate(sheet.columns):
                     column.write_cell(row, colnum, record)
-
-    # def add_worksheet(self, name=None, worksheet_class=None):
-    #     """
-    #     Add a new worksheet to the Excel workbook.
-    #
-    #     Args:
-    #         name: The worksheet name. Defaults to 'Sheet1', etc.
-    #
-    #     Returns:
-    #         Reference to a worksheet object.
-    #
-    #     """
-    #     if worksheet_class is None:
-    #         worksheet_class = self.worksheet_class
-    #     return self._add_sheet(name, is_chartsheet=False, worksheet_class=worksheet_class)
 
     def _add_sheet(self, name, is_chartsheet=None, worksheet_class=None):
         if worksheet_class:
@@ -126,6 +108,8 @@ class XlsTemplate(Workbook):
 
         sheet_index = len(self.worksheets_objs)
         name = self._check_sheetname(name, isinstance(worksheet, Chartsheet))
+
+        worksheet.protect()
 
         # Initialization data to pass to the worksheet.
         init_data = {

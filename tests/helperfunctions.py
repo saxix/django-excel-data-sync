@@ -124,7 +124,7 @@ def register(key, col):
         register_column(key, old)
 
 
-def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements=[]):  # noqa
+def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={}):  # noqa
     # Compare two XLSX files by extracting the XML files from each
     # zip archive and comparing them.
     #
@@ -187,6 +187,12 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements=[])
             exp_xml_str = exp_xml_str.decode('utf-8')
 
         # Remove dates and user specific data from the core.xml data.
+        if filename == 'docProps/custom.xml':
+            exp_xml_str = re.sub(r'name="Creation Date"><vt:filetime>[^<]*',
+                                 'name="Creation Date"><vt:filetime>', exp_xml_str)
+            got_xml_str = re.sub(r'name="Creation Date"><vt:filetime>[^<]*',
+                                 'name="Creation Date"><vt:filetime>', got_xml_str)
+
         if filename == 'docProps/core.xml':
             exp_xml_str = re.sub(r' ?John', '', exp_xml_str)
             exp_xml_str = re.sub(r'\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ',
