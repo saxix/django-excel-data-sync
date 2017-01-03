@@ -2,6 +2,8 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+
+import itertools
 from datetime import datetime
 from decimal import Decimal
 
@@ -31,7 +33,8 @@ def create_admin():
 # option = itertools.cycle(range(1,9))
 # dec = itertools.cycle([Decimal("100.23")])
 # fl = itertools.cycle([100.23, 23,32])
-# range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])
+range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])
+choices = itertools.cycle([1,2,3])
 # t = itertools.cycle(["08:00", "09:00"])
 #
 HOUR = 3600
@@ -39,15 +42,18 @@ DAY = HOUR * 24
 
 
 def factory(r=1, **values):
-    if r > len(DemoModel.CHOICES):
-        c = 0
-    else:
-        c = r
+    global range_5_10, choices
+
+    if (r % len(DemoModel.CHOICES)) == 0:
+        choices = itertools.cycle([1,2,3])
+
+    if r % 5 == 0:
+        range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])
 
     defaults = {
         'big_integer': r,
         'char': 'Name {}'.format(r),
-        'choices': DemoModel.CHOICES[c - 1][0],
+        'choices': choices.next(),
         'date': datetime.fromtimestamp((r - 1) * DAY, tz=pytz.UTC).date(),
         'datetime': datetime.fromtimestamp(r * DAY, tz=pytz.UTC),
         'date_range': datetime(2000, 1, 1).date(),
@@ -59,10 +65,10 @@ def factory(r=1, **values):
         'boolean': [True, False][int(r % 2)],
         'max_value_10': 8,
         'null_boolean': [True, False][int(r % 2)],
-        'option': Option.objects.filter(pk=1).first(),
+        # 'option': Option.objects.filter(pk=1).first(),
         'positive_integer': '{}'.format(r),
         'positive_small_integer': '{}'.format(r),
-        'range_5_10': 5,
+        'range_5_10': range_5_10.next(),
         'small_integer': '{}'.format(r),
         'text': 'a' * r,
         'time': datetime.fromtimestamp(r * HOUR).time(),
@@ -71,8 +77,8 @@ def factory(r=1, **values):
         'uuid': '808506faa4174559a9ecba34ba3decef',
     }
     defaults.update(values)
-    if not defaults['option']:
-        defaults['option'] = Option.objects.get_or_create(name="Option 1")[0]
+    if 'option' not in defaults:
+        defaults['option'] = Option.objects.get_or_create(name="Option {}".format(r))[0]
     try:
         m = DemoModel.objects.get(id=r)
     except DemoModel.DoesNotExist:
