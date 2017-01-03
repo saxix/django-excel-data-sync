@@ -300,7 +300,6 @@ class AutoColumn(NumberColumn):
         self._sheet.write(row, col, v, self.get_format(locked=1))
 
 
-
 class BigAutoColumn(AutoColumn):
     as_internal_type = "BigIntegerField"
 

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import itertools
 import logging
 from datetime import datetime
 from decimal import Decimal
@@ -10,12 +9,6 @@ import pytz
 from django.contrib.auth.models import User
 from example.models import DemoModel, Option
 
-# import random
-
-
-# from faker import Faker
-
-# fake = Faker()
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +47,7 @@ def factory(r=1, **values):
     defaults = {
         'big_integer': r,
         'char': 'Name {}'.format(r),
-        'choices': DemoModel.CHOICES[c-1][0],
+        'choices': DemoModel.CHOICES[c - 1][0],
         'date': datetime.fromtimestamp((r - 1) * DAY, tz=pytz.UTC).date(),
         'datetime': datetime.fromtimestamp(r * DAY, tz=pytz.UTC),
         'date_range': datetime(2000, 1, 1).date(),

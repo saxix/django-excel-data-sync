@@ -2,16 +2,15 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+from datetime import datetime
 
 import pytest
 import pytz
-from datetime import datetime
-from xlrd import xldate_as_tuple
-
 from example.management.demo import factory
-from example.models import DemoModel, Option, DemoModelVBA
+from example.models import DemoModel, DemoModelVBA, Option
 from excel_data_sync.xls import XlsTemplate
-from helperfunctions import _compare_xlsx_files, get_io, get_target_xls, _check_format
+from helperfunctions import (_compare_xlsx_files, get_io,
+                             get_target_xls,)
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +92,7 @@ def test_write_enable_vba(data):
     io = get_io(exp_filename)
     with XlsTemplate(io) as xls:
         xls.process_model(DemoModelVBA,
-                          fields=['vba', ])
+                          fields=['col', ])
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)
 

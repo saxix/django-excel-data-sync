@@ -240,10 +240,10 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={},
             for pattern in patterns:
                 for i, tag in enumerate(got_xml):
                     if re.match(pattern, tag):
-                        got_xml[i+1] = ''
+                        got_xml[i + 1] = ''
                 for i, tag in enumerate(exp_xml):
                     if re.match(pattern, tag):
-                        exp_xml[i+1] = ''
+                        exp_xml[i + 1] = ''
 
         if filename in ignore_elements:
             patterns = ignore_elements[filename]
