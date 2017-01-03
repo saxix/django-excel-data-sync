@@ -56,7 +56,6 @@ class Rule(object):
 class Registry(object):
     __FORMULAS = {
         "any": [],
-        # "unique": Rule(['COUNTIF(INDIRECT(ADDRESS(1,COLUMN()) & ":" & ADDRESS(65536, COLUMN())),THIS)=1']),
         "unique": Rule(['COUNTIF({current_column},THIS)=1'],
                        "No duplicates allowed in this column"),
         "number": Rule(['ISNUMBER(VALUE(THIS))'],

@@ -54,32 +54,6 @@ fmts = [
 ]
 
 
-# xls_options_default = {
-# 'date_format': 'd/m/Y',
-#                        'datetime_format': 'N j, Y, P',
-#                        'time_format': 'P',
-#                        'sheet_name': 'Sheet1',
-# models.DateField: 'DD MMM-YY',
-# models.DateTimeField: 'DD MMD YY hh:mm',
-# models.TimeField: 'hh:mm',
-# models.IntegerField: '#,##',
-# models.PositiveIntegerField: '#,##',
-# models.PositiveSmallIntegerField: '#,##',
-# models.BigIntegerField: '#,##',
-# models.DecimalField: '#,##0.00',
-# models.BooleanField: 'boolean',
-# models.NullBooleanField: 'boolean',
-# models.EmailField: lambda value: 'HYPERLINK("mailto:%s","%s")' % (value, value),
-# models.URLField: lambda value: 'HYPERLINK("%s","%s")' % (value, value),
-# models.CurrencyColumn': '"$"#,##0.00);[Red]("$"#,##0.00)',
-# }
-
-
-# class Format(dict):
-#     def __repr__(self):
-#         return ";".join(["{}:{}".format(k, v) for k, v in self.items()])
-
-
 @python_2_unicode_compatible
 class Header(object):
     format = {'bold': True,
@@ -207,8 +181,6 @@ class Column(object):
                     "criteria": "",
                     "value": formula,
                     "error_message": "\n".join(self.rule_parser.get_messages(context)),
-                    # "error_message": "Enter a value between {} and {}".format(self.min_value,
-                    #                                                           self.max_value),
                     }
         except Exception as e:  # pragma: no-cover
             logger.exception(e)
@@ -229,8 +201,6 @@ class Column(object):
 
 class DateColumn(Column):
     format = {'locked': 0, }
-    # num_format = 'D MMM YYYY'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
-    # main_validator = ["date"]
     _format_attr = 'default_date_format'
     validate = "date"
     epoch = datetime.datetime(1900, 1, 1)
@@ -267,7 +237,6 @@ class DateColumn(Column):
 
 
 class DateTimeColumn(DateColumn):
-    # num_format = 'D MMM YYYY h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
     _format_attr = 'default_datetime_format'
     validate = "date"
 
@@ -277,7 +246,6 @@ class DateTimeColumn(DateColumn):
 
 
 class TimeColumn(DateColumn):
-    # num_format = 'h:mm:ss'  # date_time = datetime.datetime.strptime('2013-01-23', '%Y-%m-%d')
     _format_attr = 'default_time_format'
     validate = "time"
 
