@@ -83,6 +83,7 @@ class Column(object):
     validate = 'custom'
     ignore_field_validators = False
     length = None
+    need_vba = False
 
     def __init__(self, field, options=None):
         self.field = field

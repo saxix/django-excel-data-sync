@@ -9,7 +9,7 @@ from datetime import datetime
 from xlrd import xldate_as_tuple
 
 from example.management.demo import factory
-from example.models import DemoModel, Option
+from example.models import DemoModel, Option, DemoModelVBA
 from excel_data_sync.xls import XlsTemplate
 from helperfunctions import _compare_xlsx_files, get_io, get_target_xls, _check_format
 
@@ -83,16 +83,18 @@ def test_write_data_default_formats():
     assert got == exp
 
 
-# @pytest.mark.django_db
-# def test_write_enable_vba(data):
-#     exp_filename = get_target_xls('test_vba.xls')
-#     io = get_io(exp_filename)
-#     process_model(DemoModel, io,
-#                   exclude=['email'],
-#                   options={'vba': True})
-#     got, exp = _compare_xlsx_files(io,
-#                                    exp_filename)
-#
-#     assert got == exp
-#
-''
+def process_model(DemoModel, io, exclude, options):
+    pass
+
+
+@pytest.mark.django_db
+def test_write_enable_vba(data):
+    exp_filename = get_target_xls('test_vba.xls')
+    io = get_io(exp_filename)
+    with XlsTemplate(io) as xls:
+        xls.process_model(DemoModelVBA,
+                          fields=['vba', ])
+    got, exp = _compare_xlsx_files(io,
+                                   exp_filename)
+
+    assert got == exp

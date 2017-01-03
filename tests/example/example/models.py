@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import logging
 from datetime import datetime
 from six import python_2_unicode_compatible
 
-from concurrency.fields import IntegerVersionField
+from concurrency.fields import (AutoIncVersionField, IntegerVersionField,
+                                TriggerVersionField, )
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from excel_data_sync.columns import NumberColumn, register_column
 
 
 @python_2_unicode_compatible
@@ -78,3 +81,14 @@ class UserDetail(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class VBAColumn(NumberColumn):
+    need_vba = True
+
+
+class DemoModelVBA(models.Model):
+    col = models.IntegerField()
+
+
+register_column(VBAColumn, 'example.demomodelvba.col')
