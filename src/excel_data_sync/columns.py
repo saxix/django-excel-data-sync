@@ -105,7 +105,7 @@ class Header(object):
 class Column(object):
     format = {'locked': 0}
     num_format = ''
-    main_validator = None
+    main_validators = None
     validate = 'custom'
     ignore_field_validators = False
     length = None
@@ -114,7 +114,7 @@ class Column(object):
         self.field = field
         self.options = options or {}
         self.field_type = type(field)
-        self.rule_parser = RuleEngine(self.main_validator)
+        self.rule_parser = RuleEngine(self.main_validators)
         self.default = field.default
         self.max_length = field.max_length
         self.min_length = None
@@ -161,7 +161,7 @@ class Column(object):
         fmt.update(kwargs)
         return self._sheet._book.add_format(fmt)
 
-    def parse_validators(self):
+    def process_field_validators(self):
         if self.ignore_field_validators:
             return
         if self.max_length is not None:
@@ -190,7 +190,7 @@ class Column(object):
                 return {"validate": "list",
                         "dropdown": True,
                         "value": [x[1] for x in self.field.choices]}
-            self.parse_validators()
+            self.process_field_validators()
             context = dict(current_column=THIS_COL,
                            max_value=self.max_value,
                            min_value=self.min_value,
@@ -211,9 +211,6 @@ class Column(object):
                     #                                                           self.max_value),
                     }
         except Exception as e:  # pragma: no-cover
-            raise
-            # FIXME: remove me
-            print(111, e)
             logger.exception(e)
             return {"validate": "any"}
 
@@ -247,7 +244,7 @@ class DateColumn(Column):
         self._sheet.write_datetime(row, col, v, self.get_format())
 
     def _get_validation(self):
-        self.parse_validators()
+        self.process_field_validators()
         value = self.epoch
         criteria = ">="
         maximum = None
@@ -287,14 +284,14 @@ class TimeColumn(DateColumn):
 
 class NumberColumn(Column):
     num_format = '#,##'
-    main_validator = ["number"]
+    main_validators = ["number"]
 
     def __init__(self, field, options=None):
         super(NumberColumn, self).__init__(field, options)
         self.min_value, self.max_value = BaseDatabaseOperations.integer_field_ranges[field.get_internal_type()]
 
-    def parse_validators(self):
-        super(NumberColumn, self).parse_validators()
+    def process_field_validators(self):
+        super(NumberColumn, self).process_field_validators()
         self.rule_parser.append("min")
         self.rule_parser.append("max")
 
@@ -341,12 +338,12 @@ class BigAutoColumn(AutoColumn):
 
 class DecimalColumn(Column):
     num_format = '#,##0.00'
-    main_validator = ["number"]
+    main_validators = ["number"]
 
 
 class FloatColumn(Column):
     num_format = '#,##0.00'
-    main_validator = ["number"]
+    main_validators = ["number"]
 
 
 class BooleanColumn(Column):
@@ -364,12 +361,12 @@ class NullBooleanColumn(Column):
 
 
 class IpAddressColumn(Column):
-    main_validator = ["ip"]
+    main_validators = ["ip"]
 
 
 class UUIDColumn(Column):
     num_format = 'general'
-    main_validator = ["uuid", "length"]
+    main_validators = ["uuid", "length"]
     length = 32
     ignore_field_validators = True
 
@@ -382,7 +379,7 @@ class TextColumn(Column):
 
 
 class EmailColumn(Column):
-    main_validator = ["email"]
+    main_validators = ["email"]
 
 
 class ForeignKeyColumn(Column):

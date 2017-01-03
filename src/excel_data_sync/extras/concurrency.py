@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class ConcurrencyColumn(NumberColumn):
     format = {'locked': 1}
     num_format = '#'
-    main_validator = ["number"]
+    main_validators = ["number"]
 
     def __init__(self, field, options=None):
         super(NumberColumn, self).__init__(field, options)
