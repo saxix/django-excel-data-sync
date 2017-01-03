@@ -314,6 +314,7 @@ class PositiveIntegerColumn(NumberColumn):
 
 class AutoColumn(NumberColumn):
     as_internal_type = "IntegerField"
+    format = {'locked': 1}
 
     def __init__(self, field, options=None):
         super(NumberColumn, self).__init__(field, options)

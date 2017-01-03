@@ -32,8 +32,6 @@ def create_admin():
     u.save()
 
 
-choices = itertools.cycle(DemoModel.CHOICES)
-
 # ip = itertools.cycle([fake.ipv6(), '72.223.176.99'])
 # value_10 = itertools.cycle(range(9))
 # null_logic = itertools.cycle([None, True, False])
@@ -48,10 +46,15 @@ DAY = HOUR * 24
 
 
 def factory(r=1, **values):
+    if r > len(DemoModel.CHOICES):
+        c = 0
+    else:
+        c = r
+
     defaults = {
         'big_integer': r,
         'char': 'Name {}'.format(r),
-        'choices': next(choices)[0],
+        'choices': DemoModel.CHOICES[c-1][0],
         'date': datetime.fromtimestamp((r - 1) * DAY, tz=pytz.UTC).date(),
         'datetime': datetime.fromtimestamp(r * DAY, tz=pytz.UTC),
         'date_range': datetime(2000, 1, 1).date(),

@@ -69,10 +69,10 @@ def test_write_data_default_formats():
             time=d.time(),
             option=Option.objects.get_or_create(name='Option 1')[0])
 
-    options ={"default_date_format": 'YYYY MMM DD',
-              "default_datetime_format": 'YYYY MM DD hh:mm',
-              "default_time_format": 'hh.mm (ss)',
-              }
+    options = {"default_date_format": 'YYYY MMM DD',
+               "default_datetime_format": 'YYYY MM DD hh:mm',
+               "default_time_format": 'hh.mm (ss)',
+               }
     with XlsTemplate(io, options=options) as xls:
         xls.process_model(DemoModel,
                           fields=['date', 'datetime', 'time'],
@@ -95,3 +95,4 @@ def test_write_data_default_formats():
 #
 #     assert got == exp
 #
+''

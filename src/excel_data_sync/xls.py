@@ -38,7 +38,7 @@ class XlsTemplate(Workbook):
         options.setdefault('default_date_format', 'D-MMM-YYYY')
         options.setdefault('default_datetime_format', 'DD MMM YYYY hh:mm')
         options.setdefault('default_time_format', 'hh:mm:ss')
-        self.strings_to_numbers = True
+        options.setdefault('strings_to_numbers', True)
         self._vba_added = False
 
         self.timezone = options.pop('timezone', pytz.utc)

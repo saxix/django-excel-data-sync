@@ -124,7 +124,7 @@ def register(key, col):
         register_column(key, old)
 
 
-def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={}):  # noqa
+def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={}, clean_value={}):  # noqa
     # Compare two XLSX files by extracting the XML files from each
     # zip archive and comparing them.
     #
@@ -235,6 +235,16 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={})
             exp_xml = _xml_to_list(exp_xml_str)
 
         # Ignore test specific XML elements for defined filenames.
+        if filename in clean_value:
+            patterns = clean_value[filename]
+            for pattern in patterns:
+                for i, tag in enumerate(got_xml):
+                    if re.match(pattern, tag):
+                        got_xml[i+1] = ''
+                for i, tag in enumerate(exp_xml):
+                    if re.match(pattern, tag):
+                        exp_xml[i+1] = ''
+
         if filename in ignore_elements:
             patterns = ignore_elements[filename]
 

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConcurrencyColumn(NumberColumn):
+    format = {'locked': 1}
     num_format = '#'
     main_validator = ["number"]
 
