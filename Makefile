@@ -23,6 +23,7 @@ clean: ## remove build artifacts
 	rm -fr .cache
 	rm -fr build/
 	rm -fr dist/
+	rm -fr ./*.xls
 	rm -fr src/*.egg-info
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
