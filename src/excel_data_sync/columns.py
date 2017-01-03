@@ -107,8 +107,8 @@ class Column(object):
     num_format = ''
     main_validator = None
     validate = 'custom'
-
-    # worksheet.data_validation('B25', {'validate': 'integer',
+    ignore_field_validators = False
+    length = None
 
     def __init__(self, field, options=None):
         self.field = field
@@ -117,6 +117,7 @@ class Column(object):
         self.rule_parser = RuleEngine(self.main_validator)
         self.default = field.default
         self.max_length = field.max_length
+        self.min_length = None
         self.max_value = None
         self.min_value = None
 
@@ -161,6 +162,10 @@ class Column(object):
         return self._sheet._book.add_format(fmt)
 
     def parse_validators(self):
+        if self.ignore_field_validators:
+            return
+        if self.max_length is not None:
+            self.rule_parser.append("max_length")
         for validator in self.field.validators:
             if isinstance(validator, validators.MaxLengthValidator):
                 self.max_length = validator.limit_value
@@ -185,12 +190,12 @@ class Column(object):
                 return {"validate": "list",
                         "dropdown": True,
                         "value": [x[1] for x in self.field.choices]}
-            if self.max_length is not None:
-                self.rule_parser.append("max_length")
             self.parse_validators()
             context = dict(current_column=THIS_COL,
                            max_value=self.max_value,
                            min_value=self.min_value,
+                           length=self.length,
+                           min_length=self.min_length,
                            max_length=self.max_length)
 
             if self.rule_parser:
@@ -206,6 +211,9 @@ class Column(object):
                     #                                                           self.max_value),
                     }
         except Exception as e:  # pragma: no-cover
+            raise
+            # FIXME: remove me
+            print(111, e)
             logger.exception(e)
             return {"validate": "any"}
 
@@ -361,6 +369,9 @@ class IpAddressColumn(Column):
 
 class UUIDColumn(Column):
     num_format = 'general'
+    main_validator = ["uuid", "length"]
+    length = 32
+    ignore_field_validators = True
 
     def _get_value_from_object(self, record):
         return getattr(record, self.field.name).hex

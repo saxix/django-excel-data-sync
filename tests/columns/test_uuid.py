@@ -22,5 +22,6 @@ def test_validator_uuidfield():
     v = c._get_validation()
     assert isinstance(c, UUIDColumn)
     assert v['validate'] == 'custom'
-    assert v['value'] == '=AND(LEN(THIS)<={})'.format(f.max_length)
-    assert v["error_message"] == "String length must be lower than {} chars".format(f.max_length)
+    assert v['value'] == '=AND(HEX2DEC(THIS),LEN(THIS)=32)'
+    assert v["error_message"] == """It is not a valid UUID
+String length must be exactly 32 chars"""

@@ -12,7 +12,6 @@ ERROR_TYPE_WARNING = "warning"
 ERROR_TYPE_INFO = "information"
 error_types = [ERROR_TYPE_STOP, ERROR_TYPE_WARNING, ERROR_TYPE_INFO]
 
-
 # validate = ["integer", "decimal", "list", "date", "time", "length", "custom", "any"]
 # criteria = {"between": "between",
 #             "not between": "not between",
@@ -77,7 +76,11 @@ class Registry(object):
         "max_length": Rule(["LEN(THIS)<={max_length}"],
                            "String length must be lower than {max_length} chars"),
         "min_length": Rule(["LEN(THIS)>={min_length}"],
-                           "String length must be higher than {max_length} chars")
+                           "String length must be higher than {max_length} chars"),
+        "length": Rule(["LEN(THIS)={length}"],
+                       "String length must be exactly {length} chars"),
+        "uuid": Rule(["HEX2DEC(THIS)"],
+                     "It is not a valid UUID"),
     }
 
     def __getitem__(self, item):
