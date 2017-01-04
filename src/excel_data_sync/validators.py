@@ -25,6 +25,7 @@ error_types = [ERROR_TYPE_STOP, ERROR_TYPE_WARNING, ERROR_TYPE_INFO]
 
 
 THIS_COL = 'INDIRECT(ADDRESS(1,COLUMN()) & ":" & ADDRESS(65536, COLUMN()))'
+CELL1 = 'INDIRECT(ADDRESS(ROW(),1) & ":" & ADDRESS(ROW(), 1))'
 BASE = {"validate": "any",
         "criteria": "",
         "value": 0,

@@ -7,6 +7,8 @@
 
 import os.path
 import re
+
+import errno
 import six
 import sys
 from contextlib import contextmanager
@@ -15,6 +17,16 @@ from zipfile import BadZipfile, LargeZipFile, ZipFile
 from excel_data_sync.columns import mapping, register_column, unregister_column
 
 here = os.path.dirname(__file__)
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 
 def _xml_to_list(xml_str):
@@ -102,7 +114,10 @@ def _sort_rel_file_data(xml_elements):
 
 
 def get_target_xls(name):
-    return os.path.join(here, 'data', name)
+    target = os.path.join(here, 'data', name)
+    if not os.path.exists(os.path.dirname(target)):
+        mkdir_p(os.path.dirname(target))
+    return target
     # return os.path.join(here, 'data', str(sys.version_info[0]), name)
 
 

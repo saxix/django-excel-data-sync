@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-import logging
-
 import itertools
+import logging
 from datetime import datetime
 from decimal import Decimal
 
 import pytz
 from django.contrib.auth.models import User
 from example.models import DemoModel, Option
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +24,9 @@ def create_admin():
     u.set_password('123')
     u.save()
 
+
 range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])
-choices = itertools.cycle([1,2,3])
+choices = itertools.cycle([1, 2, 3])
 
 HOUR = 3600
 DAY = HOUR * 24
@@ -37,7 +36,7 @@ def factory(r=1, **values):
     global range_5_10, choices
 
     if (r % len(DemoModel.CHOICES)) == 0:
-        choices = itertools.cycle([1,2,3])
+        choices = itertools.cycle([1, 2, 3])
 
     if r % 5 == 0:
         range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])

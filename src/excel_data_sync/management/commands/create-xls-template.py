@@ -34,7 +34,7 @@ class Command(BaseCommand):
         else:
             qs = None
 
-        with XlsTemplate(f) as xls:
+        with XlsTemplate(f, stripes=options['stripes']) as xls:
             xls.process_model(m, queryset=qs)
 
         self.stdout.write("Saved..{}".format(f))

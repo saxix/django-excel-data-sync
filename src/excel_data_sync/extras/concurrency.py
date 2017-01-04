@@ -2,11 +2,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-from concurrency.fields import IntegerVersionField, AutoIncVersionField, TriggerVersionField
-from django.db.backends.base.operations import BaseDatabaseOperations
-from xlsxwriter.worksheet import convert_cell_args
 
-from excel_data_sync.columns import register_column, NumberColumn
+from concurrency.fields import (AutoIncVersionField, IntegerVersionField,
+                                TriggerVersionField,)
+from django.db.backends.base.operations import BaseDatabaseOperations
+from excel_data_sync.columns import NumberColumn, register_column
+from xlsxwriter.worksheet import convert_cell_args
 
 logger = logging.getLogger(__name__)
 

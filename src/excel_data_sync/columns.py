@@ -70,6 +70,7 @@ class Header(object):
 
     def __init__(self, column):
         self.column = column
+        self.column.header = self
         self.title = column.verbose_name.title()
 
     def __str__(self):
@@ -90,6 +91,7 @@ class Column(object):
     ignore_field_validators = False
     length = None
     need_vba = False
+    col_width = None
 
     def __init__(self, field, options=None):
         self.field = field
@@ -110,8 +112,12 @@ class Column(object):
     @convert_cell_args
     def format_column(self):
         self._sheet.set_column(self.number,
-                               self.number, cell_format=self._get_format())
+                               self.number,
+                               width=self.get_col_width(),
+                               cell_format=self._get_format())
 
+    def get_col_width(self):
+        return self.col_width
 
     def _get_value_from_object(self, record):
         if self.field.choices:
@@ -157,7 +163,7 @@ class Column(object):
                 self.min_value = validator.limit_value
                 self.rule_parser.append("min")
 
-    def process_workbook(self):
+    def add_data_validation(self):
         self._sheet.data_validation(1, self.number,
                                     65000, self.number,
                                     self._get_validation())
@@ -206,10 +212,11 @@ class Column(object):
 
 
 class DateColumn(Column):
-    format = {'locked': 0, 'shrink': True}
+    # format = {'locked': 0, 'shrink': True}
     _format_attr = 'default_date_format'
     validate = "date"
     epoch = datetime.datetime(1900, 1, 1)
+    col_width = 10
 
     def _get_format(self):
         return getattr(self._sheet._book, self._format_attr)
@@ -245,6 +252,7 @@ class DateColumn(Column):
 class DateTimeColumn(DateColumn):
     _format_attr = 'default_datetime_format'
     validate = "date"
+    col_width = 20
 
     def _get_value_from_object(self, record):
         v = super(DateColumn, self)._get_value_from_object(record)
@@ -359,7 +367,7 @@ class ForeignKeyColumn(Column):
     def _get_value_from_object(self, record):
         return str(getattr(record, self.field.name))
 
-    def process_workbook(self):
+    def add_data_validation(self):
         sheet_name = '{0.app_label}.{0.model_name}'.format(self.field.related_model._meta)
         fksheet = self._sheet._book.add_worksheet(sheet_name)
         fksheet.hide()
