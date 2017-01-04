@@ -59,6 +59,12 @@ class Header(object):
     format = {'bold': True,
               'locked': 1,
               'align': 'center',
+              'valign': 'top',
+              'bg_color': '#FFFFB8',
+              'shrink': True,
+              'bottom': 2,
+              'left': 1,
+              'text_wrap': True,
               'num_format': ''}
     num_format = ''
 
@@ -201,7 +207,7 @@ class Column(object):
 
 
 class DateColumn(Column):
-    format = {'locked': 0, }
+    format = {'locked': 0, 'shrink': True}
     _format_attr = 'default_date_format'
     validate = "date"
     epoch = datetime.datetime(1900, 1, 1)

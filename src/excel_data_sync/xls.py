@@ -32,15 +32,16 @@ class XlsWorkSheet(Worksheet):
 class XlsTemplate(Workbook):
     chartsheet_class = Chartsheet
     worksheet_class = XlsWorkSheet
+    header_class = Header
 
-    def __init__(self, filename=None, options=None, properties=None):
+    def __init__(self, filename=None, options=None, properties=None, **kwargs):
         options = options or {}
         options.setdefault('default_date_format', 'D-MMM-YYYY')
         options.setdefault('default_datetime_format', 'DD MMM YYYY hh:mm')
         options.setdefault('default_time_format', 'hh:mm:ss')
         options.setdefault('strings_to_numbers', True)
         self._vba_added = False
-
+        self.header_class = kwargs.pop('header_class', self.header_class)
         self.timezone = options.pop('timezone', pytz.utc)
 
         super(XlsTemplate, self).__init__(filename, options)
@@ -76,6 +77,7 @@ class XlsTemplate(Workbook):
             fields = [field.name for field in meta.get_fields()]
         if exclude is None:
             exclude = []
+
         for field_name in fields:
             if field_name in exclude:
                 continue
@@ -85,6 +87,9 @@ class XlsTemplate(Workbook):
 
         for i, header in enumerate(sheet.headers):
             sheet.write(0, i, header.title, header.get_format())
+            # sheet.write_comment(0, i, header.column.field.help_text or '')
+
+        sheet.set_column(0, len(sheet.headers), 200)
 
         for i, col in enumerate(sheet.columns):
             col.process_workbook()
