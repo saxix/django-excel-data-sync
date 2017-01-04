@@ -36,7 +36,8 @@ class XlsRuleSheet(Worksheet):
         self.write(self.MAX_LENGTH, 0, 'max_length')
         self.write(self.PRIMARY_KEY, 0, 'primary_key')
         self.write(self.EDITABLE, 0, 'editable')
-        self.hide()
+        if self._book.hide:
+            self.hide()
 
     def add_column(self, column):
         self.write(0, column.number + 1, column.header.title)
@@ -94,8 +95,7 @@ class XlsTemplate(Workbook):
     header_class = Header
 
     def __init__(self, filename=None, options=None, properties=None,
-                 header_class=None,
-                 **kwargs):
+                 protect=True, hide=True, header_class=None, **kwargs):
         options = options or {}
         options.setdefault('default_date_format', 'D-MMM-YYYY')
         options.setdefault('default_datetime_format', 'DD MMM YYYY hh:mm')
@@ -103,13 +103,17 @@ class XlsTemplate(Workbook):
         options.setdefault('strings_to_numbers', True)
 
         self._vba_added = False
+        self.protect = protect
+        self.hide = hide
         self.timezone = options.pop('timezone', pytz.utc)
 
         self.header_class = header_class or self.header_class
 
         super(XlsTemplate, self).__init__(filename, options)
-        self.default_datetime_format = self.add_format({'num_format': options.pop('default_datetime_format')})
-        self.default_time_format = self.add_format({'num_format': options.pop('default_time_format')})
+
+        self.default_datetime_format = self.add_format({'locked': False, 'num_format': options.pop('default_datetime_format')})
+        self.default_time_format = self.add_format({'locked': False, 'num_format': options.pop('default_time_format')})
+        self.default_date_format = self.add_format({'locked': False, 'num_format': options.pop('default_date_format')})
 
         if properties:
             self.set_properties(properties)
@@ -152,7 +156,7 @@ class XlsTemplate(Workbook):
                     column.write_cell(row, colnum, record)
 
     def _add_rule_sheet(self, owner):
-        worksheet = XlsRuleSheet()
+        rulesheet = XlsRuleSheet()
         sheet_index = len(self.worksheets_objs)
         name = "{}.__rules__".format(owner.name)
         init_data = {
@@ -172,12 +176,12 @@ class XlsTemplate(Workbook):
             'excel2003_style': self.excel2003_style,
             'remove_timezone': self.remove_timezone,
         }
-        worksheet._initialize(init_data)
-        worksheet._book = self
+        rulesheet._book = self
+        rulesheet._initialize(init_data)
 
-        self.worksheets_objs.append(worksheet)
-        self.sheetnames[name] = worksheet
-        owner.rules = worksheet
+        self.worksheets_objs.append(rulesheet)
+        self.sheetnames[name] = rulesheet
+        owner.rules = rulesheet
 
     def _add_sheet(self, name, is_chartsheet=None, worksheet_class=None):
         if worksheet_class:
@@ -191,7 +195,8 @@ class XlsTemplate(Workbook):
         sheet_index = len(self.worksheets_objs)
         name = self._check_sheetname(name, isinstance(worksheet, Chartsheet))
 
-        worksheet.protect()
+        if self.protect:
+            worksheet.protect()
 
         # Initialization data to pass to the worksheet.
         init_data = {

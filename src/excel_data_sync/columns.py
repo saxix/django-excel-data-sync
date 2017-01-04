@@ -370,7 +370,8 @@ class ForeignKeyColumn(Column):
     def add_data_validation(self):
         sheet_name = '{0.app_label}.{0.model_name}'.format(self.field.related_model._meta)
         fksheet = self._sheet._book.add_worksheet(sheet_name)
-        fksheet.hide()
+        if self._sheet._book.hide:
+            fksheet.hide()
         for i, opt in enumerate([[x.pk, str(x)] for x in self.field.rel.model.objects.all()]):
             id, label = opt
             fksheet.write(i, 0, id)

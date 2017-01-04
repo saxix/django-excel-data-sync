@@ -17,7 +17,7 @@ class Command(BaseCommand):
         parser.add_argument('model', nargs='?', default=None)
         parser.add_argument('--data', action='store_true', default=False)
         parser.add_argument('--plain', action='store_true', default=False)
-        parser.add_argument('--stripes', action='store_true', default=False)
+        parser.add_argument('--debug', action='store_true', default=False)
         parser.add_argument('-f',
                             '--filename', action='store', dest='filename',
                             default=None,
@@ -34,7 +34,9 @@ class Command(BaseCommand):
         else:
             qs = None
 
-        with XlsTemplate(f, stripes=options['stripes']) as xls:
+        hide = not options['debug']
+        protect = not options['debug']
+        with XlsTemplate(f, protect=protect, hide=hide) as xls:
             xls.process_model(m, queryset=qs)
 
         self.stdout.write("Saved..{}".format(f))
