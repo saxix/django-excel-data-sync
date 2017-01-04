@@ -23,7 +23,7 @@ class ConcurrencyColumn(NumberColumn):
     @convert_cell_args
     def write_cell(self, row, col, record, *args):
         v = self._get_value_from_object(record)
-        self._sheet.write(row, col, v, self.get_format(locked=1))
+        self._sheet.write(row, col, v, self._get_format(locked=1))
 
 
 register_column(IntegerVersionField, ConcurrencyColumn)

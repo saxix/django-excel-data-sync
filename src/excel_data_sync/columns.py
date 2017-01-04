@@ -75,7 +75,7 @@ class Header(object):
     def __str__(self):
         return smart_str("<Header {0.column.verbose_name}>".format(self))
 
-    def get_format(self):
+    def _get_format(self):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
         return self.column._sheet._book.add_format(fmt)
@@ -105,14 +105,13 @@ class Column(object):
     @convert_cell_args
     def write_cell(self, row, col, record, *args):
         v = self._get_value_from_object(record)
-        self._sheet.write(row, col, v, self.get_format())
+        self._sheet.write(row, col, v, self._get_format())
 
     @convert_cell_args
     def format_column(self):
         self._sheet.set_column(self.number,
-                               self.number, cell_format=self.get_format())
+                               self.number, cell_format=self._get_format())
 
-        # self._sheet.write_blank(row, col, '', self.get_format(self._sheet._book))
 
     def _get_value_from_object(self, record):
         if self.field.choices:
@@ -120,23 +119,23 @@ class Column(object):
             return getattr(record, getter)()
         return getattr(record, self.field.name)
 
-    def to_xls(self, value):
-        """
-        Converts the input value into the expected Python data type, raising
-        django.core.exceptions.ValidationError if the data can't be converted.
-        Returns the converted value. Subclasses should override this.
-        """
-        return value
+    # def to_xls(self, value):
+    #     """
+    #     Converts the input value into the expected Python data type, raising
+    #     django.core.exceptions.ValidationError if the data can't be converted.
+    #     Returns the converted value. Subclasses should override this.
+    #     """
+    #     return value
+    #
+    # def to_python(self, value):
+    #     """
+    #     Converts the input value into the expected Python data type, raising
+    #     django.core.exceptions.ValidationError if the data can't be converted.
+    #     Returns the converted value. Subclasses should override this.
+    #     """
+    #     return value
 
-    def to_python(self, value):
-        """
-        Converts the input value into the expected Python data type, raising
-        django.core.exceptions.ValidationError if the data can't be converted.
-        Returns the converted value. Subclasses should override this.
-        """
-        return value
-
-    def get_format(self, **kwargs):
+    def _get_format(self, **kwargs):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
         fmt.update(kwargs)
@@ -212,13 +211,13 @@ class DateColumn(Column):
     validate = "date"
     epoch = datetime.datetime(1900, 1, 1)
 
-    def get_format(self):
+    def _get_format(self):
         return getattr(self._sheet._book, self._format_attr)
 
     @convert_cell_args
     def write_cell(self, row, col, record, *args):
         v = self._get_value_from_object(record)
-        self._sheet.write_datetime(row, col, v, self.get_format())
+        self._sheet.write_datetime(row, col, v, self._get_format())
 
     def _get_validation(self):
         self.process_field_validators()
@@ -303,7 +302,7 @@ class AutoColumn(NumberColumn):
     @convert_cell_args
     def write_cell(self, row, col, record, *args):
         v = self._get_value_from_object(record)
-        self._sheet.write(row, col, v, self.get_format(locked=1))
+        self._sheet.write(row, col, v, self._get_format(locked=1))
 
 
 class BigAutoColumn(AutoColumn):

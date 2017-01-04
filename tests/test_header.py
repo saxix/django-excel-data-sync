@@ -17,4 +17,4 @@ def test_base():
         xls.process_model(DemoModel)
 
     headers = xls.worksheets_objs[0].headers
-    assert headers[0].get_format().num_format == ''
+    assert headers[0]._get_format().num_format == ''

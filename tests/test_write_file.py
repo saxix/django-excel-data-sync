@@ -2,15 +2,17 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+from zipfile import ZipFile
+
 from datetime import datetime
 
 import pytest
 import pytz
 from example.management.demo import factory
-from example.models import DemoModel, DemoModelVBA, Option
+from example.models import DemoModel, DemoModelVBA, Option, VBAColumn
 from excel_data_sync.xls import XlsTemplate
 from helperfunctions import (_compare_xlsx_files, get_io,
-                             get_target_xls,)
+                             get_target_xls, )
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +95,11 @@ def test_write_enable_vba(data):
     with XlsTemplate(io) as xls:
         xls.process_model(DemoModelVBA,
                           fields=['col', ])
+        assert isinstance(xls.get_worksheet_by_name('demomodelvba').columns[0], VBAColumn)
+
+    zip = ZipFile(io)
+    assert 'xl/vbaProject.bin' in zip.namelist()
+
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)
 

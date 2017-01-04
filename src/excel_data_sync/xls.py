@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+import os
 
 import pytz
 from datetime import datetime
@@ -24,6 +25,9 @@ class XlsWorkSheet(Worksheet):
         column.number = len(self.columns)
         column._sheet = self
         self.columns.append(column)
+        if column.need_vba:
+            self._book.add_vba()
+
         if not header:
             header = Header(column)
         self.headers.append(header)
@@ -34,15 +38,21 @@ class XlsTemplate(Workbook):
     worksheet_class = XlsWorkSheet
     header_class = Header
 
-    def __init__(self, filename=None, options=None, properties=None, **kwargs):
+    def __init__(self, filename=None, options=None, properties=None,
+                 plain=False, stripes=True, header_class=None,
+                 **kwargs):
         options = options or {}
         options.setdefault('default_date_format', 'D-MMM-YYYY')
         options.setdefault('default_datetime_format', 'DD MMM YYYY hh:mm')
         options.setdefault('default_time_format', 'hh:mm:ss')
         options.setdefault('strings_to_numbers', True)
+
         self._vba_added = False
-        self.header_class = kwargs.pop('header_class', self.header_class)
         self.timezone = options.pop('timezone', pytz.utc)
+
+        self.header_class = header_class or self.header_class
+        self.plain = plain
+        self.stripes = stripes
 
         super(XlsTemplate, self).__init__(filename, options)
         self.default_datetime_format = self.add_format({'num_format': options.pop('default_datetime_format')})
@@ -50,26 +60,16 @@ class XlsTemplate(Workbook):
 
         if properties:
             self.set_properties(properties)
-            # self.set_properties({
-            # 'title':    'This is an example spreadsheet',
-            # 'subject':  'With document properties',
-            # 'author':   'John McNamara',
-            # 'manager':  'Dr. Heinz Doofenshmirtz',
-            # 'company':  'of Wolves',
-            # 'category': 'Example spreadsheets',
-            # 'keywords': 'Sample, Example, Properties',
-            # 'status': '',
-            # 'comments': 'Created with Python and XlsxWriter'
-        # })
         self.set_custom_property("Creation Date", datetime.today(), "date")
 
         self.define_name('THIS', '=!A1')
         self.define_name('THIS_COL', '=!A')
 
-    # def add_vba(self):
-    #     if not self._vba_added:
-    #         self.add_vba_project(os.path.join(os.path.dirname(__file__), 'vbaProject.bin'))
-    #         self._vba_added = True
+    def add_vba(self):
+        if not self._vba_added:
+            self.add_vba_project(os.path.join(os.path.dirname(__file__), 'vbaProject.bin'))
+            self._vba_added = True
+
     def process_model(self, model, fields=None, exclude=None, queryset=None):
         sheet = self.add_worksheet(model._meta.model_name)
         meta = model._meta
@@ -86,10 +86,8 @@ class XlsTemplate(Workbook):
             sheet.add_column(c)
 
         for i, header in enumerate(sheet.headers):
-            sheet.write(0, i, header.title, header.get_format())
+            sheet.write(0, i, header.title, header._get_format())
             # sheet.write_comment(0, i, header.column.field.help_text or '')
-
-        sheet.set_column(0, len(sheet.headers), 200)
 
         for i, col in enumerate(sheet.columns):
             col.process_workbook()

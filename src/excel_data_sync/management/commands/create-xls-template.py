@@ -16,6 +16,8 @@ class Command(BaseCommand):
         super(Command, self).add_arguments(parser)
         parser.add_argument('model', nargs='?', default=None)
         parser.add_argument('--data', action='store_true', default=False)
+        parser.add_argument('--plain', action='store_true', default=False)
+        parser.add_argument('--stripes', action='store_true', default=False)
         parser.add_argument('-f',
                             '--filename', action='store', dest='filename',
                             default=None,
@@ -31,8 +33,10 @@ class Command(BaseCommand):
             qs = m.objects.all()
         else:
             qs = None
+
         with XlsTemplate(f) as xls:
             xls.process_model(m, queryset=qs)
+
         self.stdout.write("Saved..{}".format(f))
         if qs:
             self.stdout.write("Dumped {} records".format(qs.count()))

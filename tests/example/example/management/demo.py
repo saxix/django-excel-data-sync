@@ -26,17 +26,9 @@ def create_admin():
     u.set_password('123')
     u.save()
 
-
-# ip = itertools.cycle([fake.ipv6(), '72.223.176.99'])
-# value_10 = itertools.cycle(range(9))
-# null_logic = itertools.cycle([None, True, False])
-# option = itertools.cycle(range(1,9))
-# dec = itertools.cycle([Decimal("100.23")])
-# fl = itertools.cycle([100.23, 23,32])
 range_5_10 = itertools.cycle([5, 6, 7, 8, 9, 10])
 choices = itertools.cycle([1,2,3])
-# t = itertools.cycle(["08:00", "09:00"])
-#
+
 HOUR = 3600
 DAY = HOUR * 24
 
