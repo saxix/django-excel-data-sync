@@ -90,7 +90,6 @@ class XlsWorkSheet(Worksheet):
         }
         return super(XlsWorkSheet, self).protect(password, options)
 
-
     def _initialize(self, init_data):
         super(XlsWorkSheet, self)._initialize(init_data)
 
