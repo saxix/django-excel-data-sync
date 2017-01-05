@@ -11,5 +11,5 @@ class XlsDataSyncConfig(AppConfig):
         try:
             from concurrency.fields import VersionField  # noqa
             import excel_data_sync.extras.concurrency  # noqa
-        except ImportError:
+        except ImportError:  # pragma: no-cover
             pass

@@ -21,12 +21,7 @@ def compare_props(got, exp):
                                                                (
                                                                r'<TitlesOfParts>.+?(?=</TitlesOfParts>)</TitlesOfParts>',
                                                                r''),
-                                                               ],
-                                          # 'docProps/core.xml': [
-                                          #     (r'<dc:description>.+?(?=</dc:description>)</dc:description>',
-                                          #      r''),
-                                          #     ]
-    }
+                                                               ]}
                                )
 
 
@@ -82,7 +77,6 @@ def test_write_properties3():
     got, exp = compare_props(io, exp_filename)
 
     assert got == exp
-
 
 
 @pytest.mark.django_db

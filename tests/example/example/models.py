@@ -87,10 +87,12 @@ class VBAColumn(NumberColumn):
 
 
 class DemoModelVBA(models.Model):
-    col = models.IntegerField()
+    col1 = models.IntegerField()
+    col2 = models.IntegerField()
 
     class Meta:
         app_label = 'example'
 
 
-register_column('example.demomodelvba.col', VBAColumn)
+register_column('example.demomodelvba.col1', VBAColumn)
+register_column('example.demomodelvba.col2', VBAColumn)

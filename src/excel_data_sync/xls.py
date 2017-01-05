@@ -52,7 +52,6 @@ class XlsRuleSheet(Worksheet):
         self.write_boolean(self.PRIMARY_KEY, column.number + 1, column.field.max_length)
         self.write_boolean(self.EDITABLE, column.number + 1, column.field.max_length)
         self.write(self.COLUMN, column.number + 1, column.__class__.__name__)
-        # self.write(self.RULES, column.number + 1, column.__class__.__name__)
 
         default = column.field.default
         if not default == NOT_PROVIDED:
@@ -292,6 +291,6 @@ class XlsTemplate(Workbook):
         try:
             if not self.fileclosed and self.filename:
                 self.close()
-        except:
+        except:  # pragma: no-cover
             raise Exception("Exception caught in workbook destructor. "
                             "Explicit close() may be required for workbook.")

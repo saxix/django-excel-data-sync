@@ -138,7 +138,7 @@ def register(key, col):
         register_column(key, old)
 
 
-def _compare_xlsx_files(got_file, exp_file,
+def _compare_xlsx_files(got_file, exp_file,  # noqa
                         ignore_files=[],
                         ignore_elements={},
                         clean_value={},

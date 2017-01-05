@@ -78,11 +78,26 @@ def test_write_enable_vba(data):
     io = get_io(exp_filename)
     with XlsTemplate(io) as xls:
         xls.process_model(DemoModelVBA,
-                          fields=['col', ])
+                          fields=['col1', 'col2'])
         assert isinstance(xls.get_worksheet_by_name('demomodelvba').columns[0], VBAColumn)
 
     zip = ZipFile(io)
     assert 'xl/vbaProject.bin' in zip.namelist()
+
+    got, exp = _compare_xlsx_files(io,
+                                   exp_filename)
+
+    assert got == exp
+
+
+@pytest.mark.django_db
+def test_write_debug(data):
+    exp_filename = get_target_xls('test_debug.xls')
+    io = get_io(exp_filename)
+    with XlsTemplate(io, protect=False, hide=False) as xls:
+        xls.process_model(DemoModel,
+                          fields=['date', 'datetime', 'time'],
+                          queryset=DemoModel.objects.all())
 
     got, exp = _compare_xlsx_files(io,
                                    exp_filename)

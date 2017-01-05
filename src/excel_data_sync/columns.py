@@ -54,7 +54,6 @@ fmts = [
 ]
 
 
-@python_2_unicode_compatible
 class Header(object):
     format = {'bold': True,
               'locked': 1,
@@ -72,9 +71,6 @@ class Header(object):
         self.column = column
         self.column.header = self
         self.title = column.verbose_name.title()
-
-    def __str__(self):
-        return smart_str("<Header {0.column.verbose_name}>".format(self))
 
     def _get_format(self):
         fmt = dict(self.format)
