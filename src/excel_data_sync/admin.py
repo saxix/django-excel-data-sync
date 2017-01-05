@@ -159,7 +159,7 @@ class XlsDataSyncAdminMixin(ExtraUrlMixin):
 def get_action(request):
     try:
         action_index = int(request.POST.get('index', 0))
-    except ValueError:  # pragma: no-cover
+    except ValueError:  # pragma: no cover
         action_index = 0
     return request.POST.getlist('action')[action_index]
 

@@ -196,7 +196,7 @@ class Column(object):
             rule["value"] = formula
             rule["error_message"] = "\n".join(self.rule_parser.get_messages(context))
             return rule
-        except Exception as e:  # pragma: no-cover
+        except Exception as e:  # pragma: no cover
             logger.exception(e)
             return {"validate": "any"}
 
@@ -204,7 +204,7 @@ class Column(object):
         if item in ('blank', 'null', 'max_length', 'name', 'related_model',
                     'choices', 'unique', 'verbose_name',):
             return getattr(self.field, item)
-        raise AttributeError(item)  # pragma: no-cover
+        raise AttributeError(item)  # pragma: no cover
 
     def __repr__(self):
         return smart_str("<{0.__class__.__name__} '{0.verbose_name}'>".format(self))

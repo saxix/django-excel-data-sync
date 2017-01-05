@@ -291,6 +291,6 @@ class XlsTemplate(Workbook):
         try:
             if not self.fileclosed and self.filename:
                 self.close()
-        except:  # pragma: no-cover
+        except:  # pragma: no cover
             raise Exception("Exception caught in workbook destructor. "
                             "Explicit close() may be required for workbook.")
