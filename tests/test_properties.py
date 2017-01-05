@@ -4,10 +4,9 @@ from __future__ import absolute_import
 import logging
 
 import pytest
-from excel_data_sync.xls import XlsTemplate
-
 from example.models import DemoModel
-from helperfunctions import get_target_xls, get_io, _compare_xlsx_files
+from excel_data_sync.xls import XlsTemplate
+from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
 
 logger = logging.getLogger(__name__)
 

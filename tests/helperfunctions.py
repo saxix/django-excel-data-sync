@@ -5,10 +5,9 @@
 # Copyright (c), 2013-2016, John McNamara, jmcnamara@cpan.org
 #
 
+import errno
 import os.path
 import re
-
-import errno
 import six
 import sys
 from contextlib import contextmanager

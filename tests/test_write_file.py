@@ -2,17 +2,15 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-from zipfile import ZipFile
-
 from datetime import datetime
+from zipfile import ZipFile
 
 import pytest
 import pytz
 from example.management.demo import factory
 from example.models import DemoModel, DemoModelVBA, Option, VBAColumn
 from excel_data_sync.xls import XlsTemplate
-from helperfunctions import (_compare_xlsx_files, get_io,
-                             get_target_xls, )
+from helperfunctions import _compare_xlsx_files, get_io, get_target_xls
 
 logger = logging.getLogger(__name__)
 

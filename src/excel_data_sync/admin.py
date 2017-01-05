@@ -22,7 +22,6 @@ try:
 except ImportError:
     ExtraUrlMixin = object
 
-
     def link():
         def inner(func):
             return func
@@ -67,7 +66,7 @@ class XlsDataSyncOptionForm(forms.Form):
         False,
         attrs={'size': 30}))
 
-    ## Worbook properties:
+    # Worbook properties:
     title = forms.CharField(max_length=100, required=False)
     subject = forms.CharField(max_length=100, required=False)
     author = forms.CharField(max_length=100, required=False)
