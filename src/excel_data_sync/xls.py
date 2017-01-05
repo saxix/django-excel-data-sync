@@ -25,6 +25,8 @@ class XlsRuleSheet(Worksheet):
     MAX_LENGTH = 6
     PRIMARY_KEY = 7
     EDITABLE = 8
+    COLUMN = 9
+    RULES = 10
 
     def _initialize(self, init_data):
         super(XlsRuleSheet, self)._initialize(init_data)
@@ -48,6 +50,8 @@ class XlsRuleSheet(Worksheet):
             self.write_number(self.MAX_LENGTH, column.number + 1, column.field.max_length)
         self.write_boolean(self.PRIMARY_KEY, column.number + 1, column.field.max_length)
         self.write_boolean(self.EDITABLE, column.number + 1, column.field.max_length)
+        self.write(self.COLUMN, column.number + 1, column.__class__.__name__)
+        # self.write(self.RULES, column.number + 1, column.__class__.__name__)
 
         default = column.field.default
         if not default == NOT_PROVIDED:
@@ -63,6 +67,29 @@ class XlsWorkSheet(Worksheet):
         super(XlsWorkSheet, self).__init__()
         self.columns = []
         self.headers = []
+
+    def protect(self, password='', options=None):
+        options = {
+            'sheet': False,
+            'content': False,
+            'objects': False,
+            'scenarios': True,
+            'format_cells': True,
+            'format_columns': True,
+            'format_rows': True,
+            'insert_columns': False,
+            'insert_rows': False,
+            'insert_hyperlinks': False,
+            'delete_columns': False,
+            'delete_rows': False,
+            'select_locked_cells': True,
+            'sort': True,
+            'autofilter': True,
+            'pivot_tables': False,
+            'select_unlocked_cells': True
+        }
+        return super(XlsWorkSheet, self).protect(password, options)
+
 
     def _initialize(self, init_data):
         super(XlsWorkSheet, self)._initialize(init_data)
@@ -81,12 +108,16 @@ class XlsWorkSheet(Worksheet):
 
     def write_columns(self):
         for i, header in enumerate(self.headers):
+            column = header.column
             self.write(0, i, header.title, header._get_format())
             help = str(header.column.field.help_text)
             if help:
                 self.write_comment(0, i, help)
-            header.column.format_column()
-            header.column.add_data_validation()
+            column.format_column()
+            column.add_data_validation()
+            self.rules.write(XlsRuleSheet.RULES,
+                             column.number + 1,
+                             ",".join(column.rule_parser))
 
 
 class XlsTemplate(Workbook):
@@ -111,9 +142,12 @@ class XlsTemplate(Workbook):
 
         super(XlsTemplate, self).__init__(filename, options)
 
-        self.default_datetime_format = self.add_format({'locked': False, 'num_format': options.pop('default_datetime_format')})
-        self.default_time_format = self.add_format({'locked': False, 'num_format': options.pop('default_time_format')})
-        self.default_date_format = self.add_format({'locked': False, 'num_format': options.pop('default_date_format')})
+        self.default_datetime_format = self.add_format({'locked': False,
+                                                        'num_format': options['default_datetime_format']})
+        self.default_time_format = self.add_format({'locked': False,
+                                                    'num_format': options['default_time_format']})
+        self.default_date_format = self.add_format({'locked': False,
+                                                    'num_format': options['default_date_format']})
 
         if properties:
             self.set_properties(properties)

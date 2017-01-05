@@ -65,6 +65,11 @@ def factory(r=1, **values):
         'unique': r,
         'url': 'http://nowhere.com/{}'.format(r),
         'uuid': '808506faa4174559a9ecba34ba3decef',
+        'not_editable': r,
+        'nullable': r,
+        'blank': r,
+        'required': r,
+
     }
     defaults.update(values)
     if 'option' not in defaults:

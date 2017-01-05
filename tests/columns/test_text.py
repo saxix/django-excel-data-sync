@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_validation():
-    f = Field('Field1')
+    f = Field('Field1', blank=True)
     c = get_column(f)
     v = c._get_validation()
     assert v['validate'] == 'any'
@@ -19,7 +19,7 @@ def test_validation():
 
 @pytest.mark.parametrize("field", [CharField, URLField])
 def test_validator_text_base(field):
-    f = field(max_length=40)
+    f = field(max_length=40, blank=True)
     c = get_column(f)
     v = c._get_validation()
     assert isinstance(c, TextColumn)
@@ -30,7 +30,7 @@ def test_validator_text_base(field):
 
 @pytest.mark.parametrize("field", [EmailField])
 def test_validator_email(field):
-    f = field()
+    f = field(blank=True)
     c = get_column(f)
     v = c._get_validation()
     assert isinstance(c, EmailColumn)

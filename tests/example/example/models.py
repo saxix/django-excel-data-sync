@@ -54,6 +54,7 @@ class DemoModel(models.Model):
     url = models.URLField()
     text = models.TextField()
 
+    required = models.CharField(max_length=255, null=False, blank=False)
     nullable = models.CharField(max_length=255, null=True, blank=True)
     blank = models.CharField(max_length=255, blank=True, null=True)
     not_editable = models.CharField(max_length=255, editable=False, blank=True, null=True)

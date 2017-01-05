@@ -144,6 +144,7 @@ class Column(object):
     def _get_format(self, **kwargs):
         fmt = dict(self.format)
         fmt['num_format'] = self.num_format
+        fmt['locked'] = not self.field.editable
         fmt.update(kwargs)
         return self._sheet._book.add_format(fmt)
 
@@ -169,9 +170,15 @@ class Column(object):
                                     self._get_validation())
 
     def _get_validation(self):
+        rule = {"validate": "custom", "criteria": ""}
         try:
             if self.field.unique:
                 self.rule_parser.append("unique")
+
+            if not self.field.blank:
+                self.rule_parser.append("required")
+                rule["ignore_blank"] = False
+
             if self.field.choices:
                 return {"validate": "list",
                         "dropdown": True,
@@ -187,13 +194,12 @@ class Column(object):
             if self.rule_parser:
                 formula = "=AND(%s)" % ",".join(self.rule_parser.get_rule(context))
             else:
-                return {"validate": "any"}
+                rule["validate"] = "any"
+                formula = ""
 
-            return {"validate": "custom",
-                    "criteria": "",
-                    "value": formula,
-                    "error_message": "\n".join(self.rule_parser.get_messages(context)),
-                    }
+            rule["value"] = formula
+            rule["error_message"] = "\n".join(self.rule_parser.get_messages(context))
+            return rule
         except Exception as e:  # pragma: no-cover
             logger.exception(e)
             return {"validate": "any"}

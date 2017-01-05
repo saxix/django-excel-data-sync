@@ -27,13 +27,13 @@ def test_repr():
 
 
 def test_get_column():
-    f = IntegerField('Field1')
+    f = IntegerField('Field1', blank=True)
     c = get_column(f)
     assert isinstance(c, IntegerColumn)
 
 
 def test_validation():
-    f = Field('Field1')
+    f = Field('Field1', blank=True)
     c = get_column(f)
     v = c._get_validation()
     assert v['validate'] == 'any'
@@ -42,7 +42,7 @@ def test_validation():
 
 
 def test_unique():
-    f = PositiveSmallIntegerField('Field1', unique=True)
+    f = PositiveSmallIntegerField('Field1', blank=True, unique=True)
     c = get_column(f)
     v = c._get_validation()
     assert v['validate'] == 'custom'

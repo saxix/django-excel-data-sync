@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_validation():
-    f = Field('Field1')
+    f = Field('Field1', blank=True)
     c = get_column(f)
     v = c._get_validation()
     assert v['validate'] == 'any'
@@ -28,7 +28,7 @@ def test_validation():
 @pytest.mark.parametrize("field", [SmallIntegerField, IntegerField, BigIntegerField,
                                    PositiveSmallIntegerField, PositiveIntegerField, ])
 def test_validator_number_base(field):
-    f = field()
+    f = field(blank=True)
     limits = BaseDatabaseOperations.integer_field_ranges[f.get_internal_type()]
     v = get_column(f)._get_validation()
     assert v['validate'] == 'custom'
@@ -39,7 +39,7 @@ def test_validator_number_base(field):
 @pytest.mark.parametrize("field", [SmallIntegerField, IntegerField, BigIntegerField,
                                    PositiveSmallIntegerField, PositiveIntegerField, ])
 def test_validator_number_min_value(field):
-    f = field(validators=[MinValueValidator(100)])
+    f = field(blank=True, validators=[MinValueValidator(100)])
     limits = 100, BaseDatabaseOperations.integer_field_ranges[f.get_internal_type()][1]
     v = get_column(f)._get_validation()
     assert v['validate'] == 'custom'
@@ -50,7 +50,7 @@ def test_validator_number_min_value(field):
 @pytest.mark.parametrize("field", [SmallIntegerField, IntegerField, BigIntegerField,
                                    PositiveSmallIntegerField, PositiveIntegerField, ])
 def test_validator_number_max_value(field):
-    f = field(validators=[MinValueValidator(100), MaxValueValidator(200)])
+    f = field(blank=True, validators=[MinValueValidator(100), MaxValueValidator(200)])
     limits = 100, 200
     v = get_column(f)._get_validation()
     assert v['validate'] == 'custom'

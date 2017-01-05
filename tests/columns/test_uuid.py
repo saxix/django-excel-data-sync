@@ -17,10 +17,11 @@ def test_validation():
 
 
 def test_validator_uuidfield():
-    f = UUIDField()
+    f = UUIDField(blank=True)
     c = get_column(f)
     v = c._get_validation()
     assert isinstance(c, UUIDColumn)
+    assert c.rule_parser == ['uuid', 'length']
     assert v['validate'] == 'custom'
     assert v['value'] == '=AND(HEX2DEC(THIS),LEN(THIS)=32)'
     assert v["error_message"] == """It is not a valid UUID

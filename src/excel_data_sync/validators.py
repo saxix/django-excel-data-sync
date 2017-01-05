@@ -81,6 +81,8 @@ class Registry(object):
                        "String length must be exactly {length} chars"),
         "uuid": Rule(["HEX2DEC(THIS)"],
                      "It is not a valid UUID"),
+        "required": Rule(["LEN(THIS)>0"],
+                         "This cell cannot be blank"),
     }
 
     def __getitem__(self, item):
@@ -102,6 +104,10 @@ class RuleEngine(list):
     def __init__(self, iterable=None):
         iterable = iterable or []
         super(RuleEngine, self).__init__(iterable)
+
+    # def append(self, p_object):
+    #     if p_object not in self:
+    #         super(RuleEngine, self).append(p_object)
 
     @cached_property
     def rules(self):
