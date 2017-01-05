@@ -38,6 +38,7 @@ class Command(BaseCommand):
         protect = not options['debug']
         with XlsTemplate(f, protect=protect, hide=hide) as xls:
             xls.process_model(m, queryset=qs)
+            xls.set_properties()
 
         self.stdout.write("Saved..{}".format(f))
         if qs:

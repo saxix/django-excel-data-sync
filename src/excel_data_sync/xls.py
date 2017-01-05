@@ -8,6 +8,7 @@ from datetime import datetime
 import pytz
 from django.db.models import NOT_PROVIDED
 from excel_data_sync.columns import Header, get_column
+from excel_data_sync.config import config
 from xlsxwriter import Workbook
 from xlsxwriter.chartsheet import Chartsheet
 from xlsxwriter.worksheet import Worksheet
@@ -88,6 +89,7 @@ class XlsWorkSheet(Worksheet):
             'pivot_tables': False,
             'select_unlocked_cells': True
         }
+        password = password or self._book.password
         return super(XlsWorkSheet, self).protect(password, options)
 
     def _initialize(self, init_data):
@@ -125,7 +127,8 @@ class XlsTemplate(Workbook):
     header_class = Header
 
     def __init__(self, filename=None, options=None, properties=None,
-                 protect=True, hide=True, header_class=None, **kwargs):
+                 protect=True, hide=True, header_class=None, password='',
+                 **kwargs):
         options = options or {}
         options.setdefault('default_date_format', 'D-MMM-YYYY')
         options.setdefault('default_datetime_format', 'DD MMM YYYY hh:mm')
@@ -134,6 +137,7 @@ class XlsTemplate(Workbook):
 
         self._vba_added = False
         self.protect = protect
+        self.password = password
         self.hide = hide
         self.timezone = options.pop('timezone', pytz.utc)
 
@@ -148,12 +152,39 @@ class XlsTemplate(Workbook):
         self.default_date_format = self.add_format({'locked': False,
                                                     'num_format': options['default_date_format']})
 
-        if properties:
-            self.set_properties(properties)
         self.set_custom_property("Creation Date", datetime.today(), "date")
 
         self.define_name('THIS', '=!A1')
         self.define_name('THIS_COL', '=!A')
+
+        self.set_properties(properties)
+
+    def set_properties(self, custom=None, **kwargs):
+        request = kwargs.pop('request', None)
+        custom = custom or {}
+        args = dict(model=getattr(self, '_model', None),
+                    request=request)
+
+        def process(value):
+            try:
+                if callable(value):
+                    return value(**args)
+                else:
+                    return value.format(**args)
+            except Exception as e:
+                logger.exception(e)
+                return ""
+
+        values = {}
+        for key, value in config['properties'].items():
+            if key in custom:
+                value = custom[key]
+            values[key] = process(value)
+        self.doc_properties = dict((k, v) for k, v in values.items()
+                                   if v or k in ['manager', 'hyperlink_base',
+                                                 'title', 'subject',
+                                                 'keywords', 'comments',
+                                                 'category'])
 
     def add_vba(self):
         if not self._vba_added:
@@ -161,6 +192,9 @@ class XlsTemplate(Workbook):
             self._vba_added = True
 
     def process_model(self, model, fields=None, exclude=None, queryset=None):
+        self._model = model
+        self.set_custom_property("Model", str(model.__name__))
+
         sheet = self.add_worksheet(model._meta.model_name)
         meta = model._meta
         if fields is None:
@@ -176,12 +210,6 @@ class XlsTemplate(Workbook):
             sheet.add_column(c)
 
         sheet.write_columns()
-
-        # for i, col in enumerate(sheet.columns):
-        #     col.add_data_validation()
-
-        # for column in sheet.columns:
-        #     column.format_column()
 
         if queryset:
             for row, record in enumerate(queryset, 1):
@@ -228,9 +256,6 @@ class XlsTemplate(Workbook):
         sheet_index = len(self.worksheets_objs)
         name = self._check_sheetname(name, isinstance(worksheet, Chartsheet))
 
-        if self.protect:
-            worksheet.protect()
-
         # Initialization data to pass to the worksheet.
         init_data = {
             'name': name,
@@ -256,6 +281,10 @@ class XlsTemplate(Workbook):
         self.worksheets_objs.append(worksheet)
         self.sheetnames[name] = worksheet
         self._add_rule_sheet(worksheet)
+
+        if self.protect:
+            worksheet.protect()
+
         return worksheet
 
     def __del__(self):

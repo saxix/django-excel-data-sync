@@ -45,20 +45,6 @@ def test_write_data(data):
 
 
 @pytest.mark.django_db
-def test_write_properties(data):
-    exp_filename = get_target_xls('with_properties.xls')
-    io = get_io(exp_filename)
-    with XlsTemplate(io, properties={'title': 'Title'}) as xls:
-        xls.process_model(DemoModel,
-                          fields=['id'])
-
-    got, exp = _compare_xlsx_files(io,
-                                   exp_filename)
-
-    assert got == exp
-
-
-@pytest.mark.django_db
 def test_write_data_default_formats():
     exp_filename = get_target_xls('default_formats.xls')
     io = get_io(exp_filename)

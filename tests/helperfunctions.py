@@ -139,7 +139,12 @@ def register(key, col):
         register_column(key, old)
 
 
-def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={}, clean_value={}):  # noqa
+def _compare_xlsx_files(got_file, exp_file,
+                        ignore_files=[],
+                        ignore_elements={},
+                        clean_value={},
+                        limit_to_files=None,
+                        ignore_re=None):  # noqa
     # Compare two XLSX files by extracting the XML files from each
     # zip archive and comparing them.
     #
@@ -176,10 +181,14 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={},
     # Get the filenames from the zip files.
     got_files = sorted(got_zip.namelist())
     exp_files = sorted(exp_zip.namelist())
-
-    # Ignore some test specific filenames.
-    got_files = [name for name in got_files if name not in ignore_files]
-    exp_files = [name for name in exp_files if name not in ignore_files]
+    if limit_to_files:
+        # Ignore some test specific filenames.
+        got_files = [name for name in got_files if name in limit_to_files]
+        exp_files = [name for name in exp_files if name in limit_to_files]
+    else:
+        # Ignore some test specific filenames.
+        got_files = [name for name in got_files if name not in ignore_files]
+        exp_files = [name for name in exp_files if name not in ignore_files]
 
     # Check that each XLSX container has the same files.
     if got_files != exp_files:
@@ -202,6 +211,13 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={},
             exp_xml_str = exp_xml_str.decode('utf-8')
 
         # Remove dates and user specific data from the core.xml data.
+        if filename == 'docProps/app.xml':
+            exp_xml_str = re.sub(r'<Application>[^<]*',
+                                 '<Application>', exp_xml_str, re.DOTALL)
+            got_xml_str = re.sub(r'<Application>[^<]*',
+                                 '<Application>', got_xml_str, re.DOTALL)
+
+        # Remove dates and user specific data from the core.xml data.
         if filename == 'docProps/custom.xml':
             exp_xml_str = re.sub(r'name="Creation Date"><vt:filetime>[^<]*',
                                  'name="Creation Date"><vt:filetime>', exp_xml_str)
@@ -209,6 +225,9 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={},
                                  'name="Creation Date"><vt:filetime>', got_xml_str)
 
         if filename == 'docProps/core.xml':
+            exp_xml_str = re.sub(r'<cp:lastModifiedBy>[^<]*', '', exp_xml_str)
+            got_xml_str = re.sub(r'<cp:lastModifiedBy>[^<]*', '', got_xml_str)
+
             exp_xml_str = re.sub(r' ?John', '', exp_xml_str)
             exp_xml_str = re.sub(r'\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ',
                                  '', exp_xml_str)
@@ -240,6 +259,13 @@ def _compare_xlsx_files(got_file, exp_file, ignore_files=[], ignore_elements={},
                                  '<c:pageMargins/>', exp_xml_str)
             got_xml_str = re.sub(r'<c:pageMargins[^>]*>',
                                  '<c:pageMargins/>', got_xml_str)
+
+        if ignore_re and filename in ignore_re:
+            patterns = ignore_re[filename]
+            for pattern in patterns:
+                match, sub = pattern
+                exp_xml_str = re.sub(match, sub, exp_xml_str, re.DOTALL)
+                got_xml_str = re.sub(match, sub, got_xml_str, re.DOTALL)
 
         # Convert the XML string to lists for comparison.
         if re.search('.vml$', filename):
