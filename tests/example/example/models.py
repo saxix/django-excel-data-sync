@@ -37,7 +37,7 @@ class DemoModel(models.Model):
     unique = models.CharField(max_length=255, unique=True)
 
     uuid = models.UUIDField(blank=True, null=True)
-    small_integer = models.SmallIntegerField(default=lambda: 1)
+    small_integer = models.SmallIntegerField(default=1)
     positive_small_integer = models.PositiveSmallIntegerField()
     null_boolean = models.NullBooleanField(default=None)
     date_range = models.DateField(validators=[MinValueValidator(datetime(2000, 1, 1).date()),
